@@ -33,7 +33,7 @@ and every `uses` entry is an edge in a graph that has to stay acyclic.
 - `title` names the dish and is required; `servings` defaults to 1. Unknown keys are
   errors, reported with a did-you-mean suggestion.
 
-#### `@yumml/core`
+#### `yumml`
 
 - A four-stage pipeline — load, YAML, schema, semantics — that reports **every**
   problem in the file at once, sorted by position, instead of stopping at the first.

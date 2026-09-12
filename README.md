@@ -273,11 +273,11 @@ real node in the file, `range` and `loc`. `severity` exists but v1 only ever emi
 
 ## Use it as a library
 
-`@yumml/core` is browser-safe by construction: it parses strings and bytes, never touches
+`yumml` is browser-safe by construction: it parses strings and bytes, never touches
 `fs`, and takes no Node built-ins. The CLI is a thin wrapper around it.
 
 ```ts
-import { parseRecipe, formatDiagnostic } from "@yumml/core";
+import { parseRecipe, formatDiagnostic } from "yumml";
 
 const result = parseRecipe(yamlText);
 if (result.ok) {

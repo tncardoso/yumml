@@ -1,5 +1,5 @@
 {
-  "name": "@yumml/core",
+  "name": "yumml",
   "version": "0.1.0",
   "description": "The yumml recipe language: parser, schema validation and semantic checks",
   "type": "module",

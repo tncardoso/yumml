@@ -20,7 +20,7 @@
     "typecheck": "tsc -p tsconfig.test.json"
   },
   "dependencies": {
-    "@yumml/core": "workspace:*"
+    "yumml": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "22.20.2"
