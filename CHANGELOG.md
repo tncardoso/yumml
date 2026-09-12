@@ -1,9 +1,12 @@
 # Changelog
 
 The format is based on [Keep a Changelog][kac], and this project uses
-[Semantic Versioning][semver]. See [docs/dev/releasing.md] for the conventions.
+[Semantic Versioning][semver]. See [docs/dev/releasing.md](docs/dev/releasing.md)
+for the conventions.
 
 ## [Unreleased]
+
+## [0.1.0] - 2026-09-12
 
 ### Added
 
@@ -70,11 +73,10 @@ and every `uses` entry is an edge in a graph that has to stay acyclic.
 - `fixtures/banana.yaml`, the annotated sketch the language was reverse-engineered
   from, held by a test to stay invalid in exactly the four known ways.
 - 126 tests across 23 suites.
-- [`example.html`](example.html), a static render of the kind of picture the model is
-  meant to drive.
 - A `justfile` for the tasks that matter, and GitHub Actions workflows that call it:
   the same commands run on a laptop and in the pipeline.
 
 [kac]: https://keepachangelog.com/en/1.1.0/
 [semver]: https://semver.org/spec/v2.0.0.html
-[Unreleased]: https://github.com/tncardoso/yumml/commits/main
+[Unreleased]: https://github.com/tncardoso/yumml/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/tncardoso/yumml/releases/tag/v0.1.0
