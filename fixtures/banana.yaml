@@ -1,0 +1,21 @@
+name: dd
+servings: 10
+ingredients:
+  - id: banana
+    name: banana (optional, set as id otherwise)
+    qty: 2
+    unit: cup tsp item ... (default item)
+steps:
+  # no uses becomes a preparation step on top
+  - id: prepare
+    desc: Butter and flour a loaf pan
+  - id: mash
+    desc: optional set as id otherwise
+    uses: ["banana"]
+  - id: melt
+    uses: ["butter"]
+  - id: mash-smooth
+    uses: ["mash", "melt"]
+  - id: bake
+    uses: ["mash-smooth"]
+    time: "5m"

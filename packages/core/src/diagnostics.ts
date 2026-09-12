@@ -157,7 +157,7 @@ function lineBounds(text: string, line: number): { start: number; end: number } 
  * Renders a diagnostic as a compiler-style code frame:
  *
  * ```
- * banana.yaml:13:11  error  ref/unresolved
+ * fixtures/banana.yaml:13:11  error  ref/unresolved
  *   ingredient "butter" is not declared
  *     13 |     uses: ["butter"]
  *        |             ^^^^^^^^

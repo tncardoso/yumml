@@ -1,0 +1,104 @@
+# A tagged push is the whole release process. Cut one with `just release X.Y.Z`,
+# which gates, bumps both packages, commits, tags, and pushes.
+#
+# The order of these three jobs is the point: `verify` can fail for free,
+# `publish` cannot be undone, and the Release is opened last so it is never a
+# promise the registry has not kept.
+
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+# Never cancelled: a half-finished publish is worse than a slow one.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: verify the tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+          cache: pnpm
+      - uses: taiki-e/install-action@9534c84618278caac52cb373bb164ed464dbd8af # v2.87.11
+        with:
+          tool: just@1.58.0
+      - run: pnpm install --frozen-lockfile
+      # The tag and the manifests have to agree before anything is published.
+      # A tag that says v0.2.0 while the packages say 0.1.0 is a mistake worth
+      # catching here rather than on npm, where it cannot be undone.
+      - run: just verify-version ${{ github.ref_name }}
+      - run: just ci
+      - run: just smoke
+
+  publish:
+    name: publish to npm
+    needs: verify
+    runs-on: ubuntu-latest
+    # Where a required reviewer would be attached, without editing this file.
+    environment: npm
+    permissions:
+      contents: read
+      # npm trusted publishing and provenance both go through OIDC. There is no
+      # NPM_TOKEN in this repository, by design.
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+          cache: pnpm
+          registry-url: "https://registry.npmjs.org"
+      - run: pnpm install --frozen-lockfile
+      - name: build
+        run: just build
+      - name: pick the dist-tag
+        id: dist
+        run: |
+          case "$GITHUB_REF_NAME" in
+            *-*) echo "tag=next"   >> "$GITHUB_OUTPUT" ;; # v0.2.0-rc.1
+            *)   echo "tag=latest" >> "$GITHUB_OUTPUT" ;;
+          esac
+      # -r publishes in dependency order, and pnpm is what rewrites the CLI's
+      # `workspace:*` dependency on core into a real version. The npm CLI does
+      # not do that, which is why this is pnpm and not npm.
+      - name: publish
+        run: |
+          pnpm -r publish \
+            --no-git-checks \
+            --access public \
+            --provenance \
+            --tag "${{ steps.dist.outputs.tag }}"
+
+  release:
+    name: GitHub Release
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: open the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          case "$GITHUB_REF_NAME" in
+            *-*) extra=--prerelease ;;
+            *)   extra= ;;
+          esac
+          gh release create "$GITHUB_REF_NAME" \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes \
+            --verify-tag \
+            $extra

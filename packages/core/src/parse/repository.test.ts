@@ -1,7 +1,8 @@
 /**
  * Tests that hold the repository itself together:
  *
- * - `banana.yaml` stays invalid, and stays invalid in *exactly* the ways we know;
+ * - `fixtures/banana.yaml` stays invalid, and stays invalid in *exactly* the ways we
+ *   know;
  * - every file in `fixtures/invalid/` fails with exactly the code its name says;
  * - the checked-in JSON Schema matches the wire schema;
  * - the core package never reaches for a Node built-in, so a browser can run it.
@@ -48,13 +49,13 @@ function keys(value: unknown): string[] {
 }
 
 describe("the banana.yaml sketch", () => {
-  const text = read("banana.yaml");
+  const text = read(`${fixtures}banana.yaml`);
 
   test("stays invalid, in exactly the known ways", () => {
     const result = parseRecipe(text);
     assert.ok(
       !result.ok,
-      "banana.yaml must never pass: if it does, the sketch or the schema changed",
+      "fixtures/banana.yaml must never pass: if it does, the sketch or the schema changed",
     );
     assert.deepEqual(
       result.diagnostics.map((d) => d.code),

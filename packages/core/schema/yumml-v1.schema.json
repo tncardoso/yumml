@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://yumml.dev/schema/v1.json",
+  "$id": "https://gh.tncardoso.com/yumml/schema/v1.json",
   "title": "yumml recipe v1",
   "description": "Shape only. A recipe that satisfies this schema can still be rejected by yumml: every `uses` entry must name a declared ingredient or step, a step's `uses` mapping may only carry `qty` when it targets an ingredient, `unit` needs a `qty`, the graph must be acyclic, and the amounts drawn from each ingredient must sum to exactly its declared quantity.",
   "type": "object",

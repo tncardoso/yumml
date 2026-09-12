@@ -1,0 +1,77 @@
+# The gate. Runs on every pull request and every push to main, and can be
+# started by hand from the Actions tab.
+#
+# Nothing here builds anything itself: every step is a `just` recipe, so a
+# green run on a laptop and a green run here mean the same thing.
+
+name: verify
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# A newer push to the same branch makes the older run pointless.
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    strategy:
+      # One Node version failing should not hide what the others did.
+      fail-fast: false
+      matrix:
+        node: ["22", "24", "26"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # Before setup-node: setup-node's pnpm cache needs pnpm on PATH to work
+      # out the store directory. The version comes from `packageManager`.
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ matrix.node }}
+          cache: pnpm
+      - uses: taiki-e/install-action@9534c84618278caac52cb373bb164ed464dbd8af # v2.87.11
+        with:
+          tool: just@1.58.0
+      - run: pnpm install --frozen-lockfile
+      - run: just ci
+
+  floor:
+    # `engines` says >=22.6. This job is the only place that claim is checked,
+    # and it checks it the way a user meets it: the packed artifact, running on
+    # the oldest Node the manifest claims to support.
+    #
+    # The build cannot happen on 22.6, because pnpm 11 declares node >=22.13
+    # (and the test command needs type stripping, which 22.6 does not have). So
+    # it builds on a Node pnpm supports, then switches to the floor to run what
+    # was built. Two setup-node calls in one job is deliberate.
+    name: engines floor (node 22.6.0)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+          cache: pnpm
+      - uses: taiki-e/install-action@9534c84618278caac52cb373bb164ed464dbd8af # v2.87.11
+        with:
+          tool: just@1.58.0
+      - run: pnpm install --frozen-lockfile
+      - name: build and pack on a supported Node
+        run: just pack
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22.6.0"
+      - name: run the artifact on the floor
+        run: |
+          node --version
+          just smoke-tarballs

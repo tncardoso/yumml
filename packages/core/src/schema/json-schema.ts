@@ -4,7 +4,7 @@
  * Editors use it for completion and inline errors in `.yaml` files:
  *
  * ```yaml
- * # yaml-language-server: $schema=https://yumml.dev/schema/v1.json
+ * # yaml-language-server: $schema=https://gh.tncardoso.com/yumml/schema/v1.json
  * title: Banana Bread
  * ```
  *
@@ -18,7 +18,7 @@
 import { z } from "zod";
 import { recipeWire } from "./wire.ts";
 
-export const JSON_SCHEMA_ID = "https://yumml.dev/schema/v1.json";
+export const JSON_SCHEMA_ID = "https://gh.tncardoso.com/yumml/schema/v1.json";
 
 export const JSON_SCHEMA_NOTE =
   "Shape only. A recipe that satisfies this schema can still be rejected by yumml: " +

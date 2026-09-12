@@ -51,9 +51,9 @@ Exit codes
   3  a bug in yumml
 
 Examples
-  yumml validate banana.yaml
-  yumml validate - < banana.yaml
-  yumml parse banana.yaml --summary
+  yumml validate fixtures/banana.yaml
+  yumml validate - < fixtures/banana.yaml
+  yumml parse fixtures/banana.yaml --summary
 `;
 
 type Options = {
@@ -71,8 +71,8 @@ function parseArgs(argv: readonly string[]): Options | { error: string } {
   let endOfOptions = false;
 
   for (const arg of argv) {
-    // `--` ends the options, which is how a package runner forwards arguments:
-    // `pnpm run yumml -- validate recipe.yaml`.
+    // `--` ends the options, POSIX-style: `yumml validate -- odd-file.yaml`.
+    // A package runner's own `--` is stripped in `main.ts`, before this runs.
     if (!endOfOptions && arg === "--") {
       endOfOptions = true;
       continue;
