@@ -1,6 +1,6 @@
 {
   "name": "@yumml/cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Command line interface for yumml recipes",
   "type": "module",
   "license": "MIT",
@@ -20,7 +20,7 @@
     "typecheck": "tsc -p tsconfig.test.json"
   },
   "dependencies": {
-    "yumml": "workspace:*"
+    "@yumml/yumml": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "22.20.2"

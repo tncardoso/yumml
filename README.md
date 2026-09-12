@@ -277,7 +277,7 @@ real node in the file, `range` and `loc`. `severity` exists but v1 only ever emi
 `fs`, and takes no Node built-ins. The CLI is a thin wrapper around it.
 
 ```ts
-import { parseRecipe, formatDiagnostic } from "yumml";
+import { parseRecipe, formatDiagnostic } from "@yumml/yumml";
 
 const result = parseRecipe(yamlText);
 if (result.ok) {

@@ -1,6 +1,6 @@
 {
-  "name": "yumml",
-  "version": "0.1.0",
+  "name": "@yumml/yumml",
+  "version": "0.1.1",
   "description": "The yumml recipe language: parser, schema validation and semantic checks",
   "type": "module",
   "license": "MIT",

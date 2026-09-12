@@ -17,7 +17,7 @@ importers:
 
   packages/cli:
     dependencies:
-      yumml:
+      '@yumml/yumml':
         specifier: workspace:*
         version: link:../core
     devDependencies:

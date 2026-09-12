@@ -6,6 +6,13 @@ for the conventions.
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-09-12
+
+### Changed
+
+- The core library now publishes as `@yumml/yumml`; the CLI, documentation, and
+  release tooling use the scoped package name.
+
 ## [0.1.0] - 2026-09-12
 
 ### Added
@@ -78,5 +85,6 @@ and every `uses` entry is an edge in a graph that has to stay acyclic.
 
 [kac]: https://keepachangelog.com/en/1.1.0/
 [semver]: https://semver.org/spec/v2.0.0.html
-[Unreleased]: https://github.com/tncardoso/yumml/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/tncardoso/yumml/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/tncardoso/yumml/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/tncardoso/yumml/releases/tag/v0.1.0

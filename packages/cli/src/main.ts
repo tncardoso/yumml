@@ -7,7 +7,7 @@
 import { readFileSync } from "node:fs";
 import { runCli } from "./cli.ts";
 
-const version = "0.1.0";
+const version = "0.1.1";
 
 const argv = process.argv.slice(2);
 

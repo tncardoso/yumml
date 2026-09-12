@@ -15,7 +15,7 @@
  * subprocess and keeps `process.exit` in `main.ts` where it belongs.
  */
 
-import { type Diagnostic, formatDiagnostic, parseRecipe } from "yumml";
+import { type Diagnostic, formatDiagnostic, parseRecipe } from "@yumml/yumml";
 import { formatSummary } from "./summary.ts";
 
 export const EXIT_OK = 0;

@@ -7,7 +7,7 @@
  * readable recipe, and a reader who reads it sees why the amounts add up.
  */
 
-import { format, type Recipe, type UnitName } from "yumml";
+import { format, type Recipe, type UnitName } from "@yumml/yumml";
 
 function amount(qty: string | undefined, unit: UnitName): string {
   return qty === undefined ? "" : `${qty} ${unit}`;

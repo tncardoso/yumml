@@ -74,7 +74,7 @@ Confirm from your own machine when it finishes:
 
 ```console
 $ just verify-release 0.2.0
-yumml@0.2.0 is on the registry
+@yumml/yumml@0.2.0 is on the registry
 @yumml/cli@0.2.0 is on the registry
 ```
 
@@ -86,13 +86,13 @@ $ just release 0.2.0-rc.1
 
 The same path with a different ending: npm gets the `next` dist-tag instead of
 `latest`, and the GitHub Release is marked a pre-release. Testers install with
-`npm install yumml@next`. Promoting it is `just release 0.2.0`.
+`npm install @yumml/yumml@next`. Promoting it is `just release 0.2.0`.
 
 ## 4. A bad release
 
 A published version cannot be replaced on npm, and the tag is not rewritten.
 
-1. `npm deprecate yumml@0.2.0 "use 0.2.1"` — tells installers to move.
+1. `npm deprecate @yumml/yumml@0.2.0 "use 0.2.1"` — tells installers to move.
 2. Fix on `main`, with a changelog entry.
 3. `just release 0.2.1`.
 

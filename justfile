@@ -77,7 +77,7 @@ pack: build
     #!/usr/bin/env bash
     rm -rf {{tarballs}}
     mkdir -p {{tarballs}}
-    {{pnpm}} --filter yumml pack --pack-destination "$PWD/{{tarballs}}"
+    {{pnpm}} --filter @yumml/yumml pack --pack-destination "$PWD/{{tarballs}}"
     {{pnpm}} --filter @yumml/cli pack --pack-destination "$PWD/{{tarballs}}"
     ls -1 {{tarballs}}
 
@@ -195,7 +195,7 @@ release version: (_preflight version)
 verify-release version:
     #!/usr/bin/env bash
     set -euo pipefail
-    for pkg in yumml @yumml/cli; do
+    for pkg in @yumml/yumml @yumml/cli; do
       for i in 1 2 3 4 5 6 7 8 9 10; do
         if npm view "$pkg@{{version}}" version >/dev/null 2>&1; then
           echo "$pkg@{{version}} is on the registry"
