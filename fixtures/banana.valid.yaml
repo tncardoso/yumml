@@ -1,0 +1,31 @@
+title: Banana Bread
+servings: 10
+ingredients:
+  - id: banana
+    qty: 2
+    unit: item
+  - id: butter
+    qty: 1/2
+    unit: cup
+  - id: flour
+    qty: 200
+    unit: g
+  - id: salt
+steps:
+  - id: prepare
+    desc: Butter and flour a loaf pan
+  - id: mash
+    uses: [banana]
+  - id: melt
+    uses: [{ id: butter, qty: 1/4 }]
+  - id: brush
+    uses: [{ id: butter, qty: 1/4 }]
+  - id: sift
+    uses: [flour]
+  - id: mix
+    uses: [sift, melt, brush, salt]
+  - id: mash-smooth
+    uses: [mash, mix]
+  - id: bake
+    uses: [mash-smooth]
+    time: 1h30m

@@ -1,0 +1,11 @@
+title: Toast
+ingredients:
+  - id: bread
+    qty: 2
+    unit: slice
+  - id: honey
+    qty: 1
+    unit: tsp
+steps:
+  - id: toast
+    uses: [bread]

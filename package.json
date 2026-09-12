@@ -1,0 +1,26 @@
+{
+  "name": "yumml",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.3.0",
+  "engines": {
+    "node": ">=22.6"
+  },
+  "scripts": {
+    "check": "biome check .",
+    "check:write": "biome check --write .",
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "test": "node --test --conditions=yumml-dev packages/core packages/cli",
+    "typecheck": "pnpm -r run typecheck",
+    "build": "pnpm -r run build",
+    "schema": "node packages/core/scripts/emit-json-schema.ts",
+    "yumml": "node packages/cli/dist/main.js",
+    "yumml:dev": "node --conditions=yumml-dev packages/cli/src/main.ts",
+    "ci": "pnpm run check && pnpm run typecheck && pnpm run test"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.13",
+    "typescript": "7.0.2"
+  }
+}

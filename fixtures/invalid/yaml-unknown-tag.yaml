@@ -1,0 +1,4 @@
+title: !Ref toast
+ingredients: []
+steps:
+  - id: toast

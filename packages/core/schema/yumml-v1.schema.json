@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yumml.dev/schema/v1.json",
+  "title": "yumml recipe v1",
+  "description": "Shape only. A recipe that satisfies this schema can still be rejected by yumml: every `uses` entry must name a declared ingredient or step, a step's `uses` mapping may only carry `qty` when it targets an ingredient, `unit` needs a `qty`, the graph must be acyclic, and the amounts drawn from each ingredient must sum to exactly its declared quantity.",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "servings": {
+      "default": 1,
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "ingredients": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 64,
+            "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+          },
+          "desc": {
+            "type": "string",
+            "minLength": 1
+          },
+          "qty": {
+            "description": "a number, or a fraction such as \"1/2\" or \"0.5\"",
+            "type": [
+              "number",
+              "string"
+            ]
+          },
+          "unit": {
+            "description": "defaults to \"item\" when qty is present",
+            "type": "string",
+            "enum": [
+              "item",
+              "pinch",
+              "clove",
+              "slice",
+              "can",
+              "package",
+              "tsp",
+              "tbsp",
+              "floz",
+              "cup",
+              "pint",
+              "quart",
+              "gallon",
+              "ml",
+              "l",
+              "mg",
+              "g",
+              "kg",
+              "oz",
+              "lb"
+            ]
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "steps": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 64,
+            "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+          },
+          "desc": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uses": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 64,
+                  "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "maxLength": 64,
+                      "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+                    },
+                    "qty": {
+                      "description": "a number, or a fraction such as \"1/2\" or \"0.5\"",
+                      "type": [
+                        "number",
+                        "string"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "qty"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            }
+          },
+          "time": {
+            "description": "minutes as a number, or a duration such as \"5m\", \"1h30m\" or \"PT5M\"",
+            "type": [
+              "number",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "title",
+    "ingredients",
+    "steps"
+  ],
+  "additionalProperties": false
+}

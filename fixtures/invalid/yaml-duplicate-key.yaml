@@ -1,0 +1,9 @@
+title: Toast
+title: Bread
+ingredients:
+  - id: bread
+    qty: 2
+    unit: slice
+steps:
+  - id: toast
+    uses: [bread]

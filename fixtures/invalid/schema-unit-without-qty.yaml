@@ -1,0 +1,7 @@
+title: Toast
+ingredients:
+  - id: salt
+    unit: pinch
+steps:
+  - id: season
+    uses: [salt]

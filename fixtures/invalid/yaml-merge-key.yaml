@@ -1,0 +1,10 @@
+title: Toast
+base: &base
+  qty: 2
+ingredients:
+  - id: bread
+    <<: *base
+    unit: slice
+steps:
+  - id: toast
+    uses: [bread]

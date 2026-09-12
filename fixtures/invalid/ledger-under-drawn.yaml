@@ -1,0 +1,8 @@
+title: Toast
+ingredients:
+  - id: butter
+    qty: 1/2
+    unit: cup
+steps:
+  - id: melt
+    uses: [{ id: butter, qty: 1/4 }]

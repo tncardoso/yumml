@@ -1,0 +1,6 @@
+title: Toast
+ingredients:
+  - id: salt
+steps:
+  - id: season
+    uses: [{ id: salt, qty: 1 }]
