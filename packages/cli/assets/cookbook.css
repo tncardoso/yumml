@@ -24,7 +24,6 @@
   --rule: #e8e4dc;
   --chip: #f4f1ec;
   --teal: #025956;
-  --teal-soft: #e4f1ee;
   --rose: #a25179;
   --rose-soft: #f7f0f4;
 
@@ -836,26 +835,13 @@ a {
 
 /* -------------------------------------------------------------------- flow */
 /*
-  The drawing itself. Geometry comes from the SVG's own attributes; only ink,
-  type and the hiding of labels at thumbnail size belong here.
+  The drawing itself belongs to core: `renderRecipe` writes the markup and carries
+  its own scoped CSS, so what is left here is how the cookbook frames it — a card
+  that crops it, a panel that scrolls it, and the ring around the current step.
 
   A card hides every text node: a 20px ingredient name scaled to a 450px card is
   five pixels tall, and the shape is what the thumbnail is for.
 */
-
-.flow {
-  display: block;
-  font-family: var(--font);
-}
-
-.card-flow .flow {
-  width: 100%;
-  height: auto;
-}
-
-.card-flow .flow-text {
-  display: none;
-}
 
 /* Core mounts the same client-side visualization in cards and detail pages. */
 .card-flow > .yumml-vis {
@@ -912,19 +898,6 @@ a {
   overflow-x: auto;
 }
 
-.flow-frame .flow {
-  width: 100%;
-  height: auto;
-  max-width: var(--flow-width);
-}
-
-.flow-frame .flow[data-wide="true"] {
-  /* A long recipe keeps its size and the panel scrolls, instead of shrinking to
-     the point where the labels are grey paste. */
-  max-width: none;
-  width: var(--flow-width);
-}
-
 .flow-frame > .yumml-vis {
   box-shadow: none;
 }
@@ -933,8 +906,6 @@ a {
   A step band is how the script walks the recipe, and the pointer says so — but
   only once the script is there. A picture that cannot be clicked should not offer.
 */
-.has-script .flow-band,
-.has-script .flow-prep,
 .has-script .yv-stage,
 .has-script .yv-prep-item {
   cursor: pointer;
@@ -945,59 +916,6 @@ a {
   outline: 3px solid var(--teal);
   outline-offset: -3px;
   z-index: 5;
-}
-
-.flow-panel {
-  fill: var(--surface);
-}
-
-.flow-prep-card {
-  fill: var(--surface);
-  stroke: var(--rule);
-  stroke-width: 1;
-}
-
-.flow-prep-number {
-  fill: var(--ink);
-}
-
-.flow-prep-index {
-  fill: #fff;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.flow-prep-text {
-  fill: var(--ink);
-  font-size: 20px;
-  font-weight: 500;
-}
-
-.flow-row-label {
-  fill: var(--ink);
-  font-size: 20px;
-  font-weight: 500;
-}
-
-.flow-band-number {
-  fill: var(--surface);
-}
-
-.flow-band-index {
-  font-size: 13.5px;
-  font-weight: 600;
-}
-
-.flow-band-label {
-  fill: #fff;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.flow-band-time {
-  fill: rgb(255 255 255 / 80%);
-  font-size: 12px;
-  font-weight: 500;
 }
 
 /* ------------------------------------------------------------------ footer */
