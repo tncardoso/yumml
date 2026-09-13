@@ -1,6 +1,19 @@
 import { format } from "./model/fraction.ts";
 import type { IngredientNode, Recipe, StepNode } from "./model/recipe.ts";
 
+/**
+ * The drawing's colours are part of this entry too: a caller that renders the flow
+ * itself needs the same ten hues core paints the bands in, and the same row tints the
+ * chips wear.
+ */
+export type { RecipeColor, RecipeColors, StageColumns } from "./render/palette.ts";
+export {
+  columnColor,
+  RECIPE_COLORS,
+  recipeColors,
+  stageColumns,
+} from "./render/palette.ts";
+
 const COLORS = ["#168477", "#397da8", "#6555a6", "#9f4f79", "#b9682f"] as const;
 
 const STYLES = `

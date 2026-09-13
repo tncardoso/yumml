@@ -132,6 +132,13 @@ export type {
 export { toModel } from "./model/recipe.ts";
 export type { UnitDimension, UnitInfo, UnitName, UnitSystem } from "./model/unit.ts";
 export { DEFAULT_UNIT, isUnitName, UNIT_NAMES, UNITS, unitInfo } from "./model/unit.ts";
+export type { RecipeColor, RecipeColors, StageColumns } from "./render/palette.ts";
+export {
+  columnColor,
+  RECIPE_COLORS,
+  recipeColors,
+  stageColumns,
+} from "./render/palette.ts";
 export { renderRecipe } from "./render.ts";
 export {
   JSON_SCHEMA_ID,
