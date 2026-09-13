@@ -8,7 +8,7 @@ import assert from "node:assert/strict";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { request } from "node:http";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { after, describe, test } from "node:test";
 import { type Cookbook, createCookbook } from "./server.ts";
 
@@ -147,6 +147,37 @@ describe("the routes", () => {
     const fraction = await fetch(`${server.url}assets/model/fraction.js`);
     assert.equal(fraction.status, 200);
     assert.match(await fraction.text(), /function format/);
+  });
+
+  test("every module the renderer imports is a module the browser can fetch", async () => {
+    // The renderer is an ES module: each of its own relative imports is another
+    // request, and a name missing from the whitelist is a 404 in the middle of
+    // loading the client — which costs the page its flow *and* its timer, since the
+    // failed module takes the script that imports it with it.
+    const server = await cookbook();
+    const fetched = new Set<string>();
+    const queue = ["render.js"];
+    while (queue.length > 0) {
+      const name = queue.shift() as string;
+      if (fetched.has(name)) continue;
+      fetched.add(name);
+      const response = await fetch(`${server.url}assets/${name}`);
+      assert.equal(
+        response.status,
+        200,
+        `/assets/${name} is not served: build core before the cookbook, and add the name to ASSET_NAMES`,
+      );
+      for (const [, specifier] of (await response.text()).matchAll(
+        /from\s+"(\.\/[^"]+)"/g,
+      )) {
+        queue.push(join(dirname(name), specifier as string).replace(/^\.\//, ""));
+      }
+    }
+    assert.deepEqual([...fetched].sort(), [
+      "model/fraction.js",
+      "render.js",
+      "render/palette.js",
+    ]);
   });
 
   test("a path that is not a route is the site's own 404", async () => {

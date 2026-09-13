@@ -15,6 +15,7 @@ export const ASSET_NAMES = [
   "cookbook.css",
   "cookbook.js",
   "render.js",
+  "render/palette.js",
   "model/fraction.js",
 ] as const;
 
@@ -26,8 +27,15 @@ const resolvedCoreRender = require.resolve("@yumml/yumml/render");
 const CORE_RENDER = resolvedCoreRender.endsWith(".ts")
   ? fileURLToPath(new URL("../../../core/dist/render.js", import.meta.url))
   : resolvedCoreRender;
+/*
+  Every module the browser will ask for, keyed by the URL it asks for it under.
+  `render.js` is an ES module, so each of its own relative imports is a second
+  request: a name missing here is not a missing file, it is a 404 in the middle of
+  loading the client, and the whole page loses its flow and its timer with it.
+*/
 const CORE_ASSETS: Readonly<Record<string, string>> = {
   "render.js": CORE_RENDER,
+  "render/palette.js": join(dirname(CORE_RENDER), "render/palette.js"),
   "model/fraction.js": join(dirname(CORE_RENDER), "model/fraction.js"),
 };
 
