@@ -3,12 +3,17 @@
   The cookbook's stylesheet, hand-written from the Penpot boards
   (refs/cookbook-recipe-list.html and the flow board in refs/example.html).
 
-  Every colour, radius and type size below was read off a board. The layout is
-  not: the boards are pictures of a 1600px artboard with every element absolutely
-  positioned, and a page that behaves on a laptop cannot be that. The rule from
-  The chrome is fluid and matches the boards at 1600px,
-  and only the flow keeps exact coordinates — those are in the SVG, emitted by
-  `render/flow.ts`.
+  The neutrals, the radii and the type sizes below were read off a board. The
+  drawing's own colours were not: they are the palette in core
+  (`packages/core/src/render/palette.ts`), which the flow paints itself, band by
+  band and row by row. `--teal` here is the page's action colour — the brand mark,
+  the timer, the badges, the focus ring — and it is the palette's teal ink, so the
+  chrome and the drawing read as one product.
+
+  The layout is not read off a board either: the boards are pictures of a 1600px
+  artboard with every element absolutely positioned, and a page that behaves on a
+  laptop cannot be that. The chrome is fluid and matches the boards at 1600px, and
+  the flow's geometry belongs to core.
 */
 
 :root {
@@ -18,7 +23,7 @@
   --muted: #8a939b;
   --rule: #e8e4dc;
   --chip: #f4f1ec;
-  --teal: #2c8c7d;
+  --teal: #025956;
   --teal-soft: #e4f1ee;
   --rose: #a25179;
   --rose-soft: #f7f0f4;
@@ -775,12 +780,18 @@ a {
   border-radius: 3px;
 }
 
+/*
+  The legend shows the drawing's own two colours, the first hue's fill and its
+  tint: a band and the row of ingredients under it, which is what a reader is
+  being told to look for. They are the palette's values from
+  `packages/core/src/render/palette.ts` — teal and teal's tint.
+*/
 .legend-swatch--step {
-  background: var(--teal);
+  background: #8ce3dd;
 }
 
 .legend-swatch--row {
-  background: #eef4f7;
+  background: #dcf7f4;
 }
 
 .legend-swatch--prep {

@@ -21,7 +21,14 @@
  * that costs a document per step instead of one.
  */
 
-import { format, type Recipe, type StepNode } from "@yumml/yumml";
+import {
+  columnColor,
+  format,
+  type Recipe,
+  type RecipeColor,
+  recipeColors,
+  type StepNode,
+} from "@yumml/yumml";
 import type { IndexedRecipe } from "../scan.ts";
 import { formatAge, formatClock, formatDuration, labelOf, plural } from "./format.ts";
 import { type Html, html } from "./html.ts";
@@ -34,8 +41,6 @@ export type DetailOptions = {
   /** The clock the "changed N ago" line reads. Passed in so tests can pin it. */
   readonly now: number;
 };
-
-const ROW_TINTS = ["#eef6f5", "#eef4f7", "#f0f0f7", "#f7f0f4", "#f9f3ef"] as const;
 
 /** The step a page shows when nothing has moved yet: the first one in order. */
 export function firstStep(recipe: Recipe): StepNode | undefined {
@@ -51,14 +56,22 @@ function totalSeconds(recipe: Recipe): number {
 /**
  * What a step takes in, as the chips the board shows: an ingredient is labelled
  * with its amount and its name, a step with its name, and the ingredient chips
- * wear the same tint their row has in the drawing, which is how the strip and the
- * flow are made to look like the same thing.
+ * wear the tint of the row that ingredient has in the drawing, which is how the
+ * strip and the flow are made to look like the same thing.
+ *
+ * `colors` is the recipe's own ingredient palette, computed once by
+ * {@link renderRecipePage} and handed down: the tint comes from the same
+ * `recipeColors` the renderer paints the rows with, so the two cannot disagree
+ * about which column an ingredient belongs to.
  */
-function draws(recipe: Recipe, step: StepNode): Html {
+function draws(
+  recipe: Recipe,
+  step: StepNode,
+  colors: ReadonlyMap<string, RecipeColor>,
+): Html {
   if (step.uses.length === 0) {
     return html`<span class="uses-none">no ingredients — a preparation step</span>`;
   }
-  const rowOf = new Map(recipe.ingredients.map((item, index) => [item.id, index]));
   const byId = new Map(recipe.steps.map((candidate) => [candidate.id, candidate]));
 
   return html`${step.uses.map((draw) => {
@@ -66,9 +79,9 @@ function draws(recipe: Recipe, step: StepNode): Html {
     if (ingredient !== undefined) {
       // What *this step* draws, which is not always what the ingredient declares:
       // `melt` takes a quarter of the butter, and saying "1/2 cup" there would be a
-      // lie about the recipe. The same tint the ingredient's row has in the
-      // drawing, so the strip and the flow read as one picture.
-      const tint = ROW_TINTS[(rowOf.get(ingredient.id) ?? 0) % ROW_TINTS.length];
+      // lie about the recipe. Every ingredient of a recipe that parsed has a tint;
+      // the first hue's is the one a model that did not come from the parser gets.
+      const tint = colors.get(ingredient.id)?.tint ?? columnColor(0).tint;
       const label =
         draw.qty === undefined
           ? labelOf(ingredient)
@@ -158,6 +171,7 @@ function strip(
   step: StepNode,
   position: number,
   current: string | undefined,
+  colors: ReadonlyMap<string, RecipeColor>,
 ): Html {
   const seconds = step.timeSec;
   const hidden = step.id === current ? html`` : html` hidden`;
@@ -170,7 +184,7 @@ function strip(
       <p class="strip-badge" aria-hidden="true">${String(position)}</p>
       <div class="strip-text">
         <h2 class="strip-title">${step.desc}</h2>
-        <p class="strip-uses">${draws(recipe, step)}</p>
+        <p class="strip-uses">${draws(recipe, step, colors)}</p>
       </div>
       <p class="strip-time">
         ${seconds === undefined ? "no time set" : formatDuration(seconds)}
@@ -180,10 +194,14 @@ function strip(
 }
 
 /** One strip per step, in cooking order, with the current one showing. */
-function strips(recipe: Recipe, current: string | undefined): Html {
+function strips(
+  recipe: Recipe,
+  current: string | undefined,
+  colors: ReadonlyMap<string, RecipeColor>,
+): Html {
   return html`${recipe.order.map((id, index) => {
     const step = recipe.steps.find((candidate) => candidate.id === id);
-    return step === undefined ? "" : strip(recipe, step, index + 1, current);
+    return step === undefined ? "" : strip(recipe, step, index + 1, current, colors);
   })}`;
 }
 
@@ -233,6 +251,9 @@ export function renderRecipePage(
   current?: StepNode,
 ): Html {
   const step = current ?? firstStep(recipe);
+  // The chips read the same palette the renderer paints the rows with, computed once
+  // for the whole document rather than once per step.
+  const colors = recipeColors(recipe).ingredients;
   return renderPage({
     title: recipe.title,
     recipes: options.recipes,
@@ -241,7 +262,7 @@ export function renderRecipePage(
     version: options.version,
     body: html`
       ${head(entry, recipe, options)} ${timer(recipe, step)}
-      ${strips(recipe, step?.id)}
+      ${strips(recipe, step?.id, colors)}
       <section class="flow-panel">
         <div class="flow-head">
           <div>

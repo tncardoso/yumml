@@ -44,6 +44,25 @@ steps:
     time: 1h30m
 `;
 
+/**
+ * Three ingredients in two columns, arranged so the two ways of picking an ingredient's
+ * colour disagree: `three` is the third ingredient declared, so colouring it by its
+ * position in `ingredients` gives it the third hue, while the column that draws it is
+ * the second.
+ */
+const THREE = `
+title: Three in a row
+ingredients:
+  - id: one
+  - id: two
+  - id: three
+steps:
+  - id: first
+    uses: [one, two]
+  - id: second
+    uses: [first, three]
+`;
+
 /** The modification time the page reports, so "changed N ago" is not a race. */
 const MTIME = Date.parse("2026-09-12T12:00:00Z");
 const NOW = Date.parse("2026-09-12T12:02:00Z");
@@ -183,10 +202,16 @@ describe("the current-step strip", () => {
   });
 
   test("an ingredient chip wears its row's tint, so the strip and the flow agree", () => {
-    // Banana is the first row, and #eef6f5 is the first tint.
+    // Banana is the first row and it sits in column 0, the one ingredient of this
+    // recipe where the row and the chip cannot disagree. `three` is in column 1 while
+    // being the third ingredient declared, so it is the one that shows the rule.
     assert.match(
       page(BANANA, 1, "mash"),
-      /class="chip uses-chip" style="background: #eef6f5">2 item banana</,
+      /class="chip uses-chip" style="background: #dcf7f4">2 item banana</,
+    );
+    assert.match(
+      page(THREE, 1, "second"),
+      /class="chip uses-chip" style="background: #f2edff">three</,
     );
   });
 
