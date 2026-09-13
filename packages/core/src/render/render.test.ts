@@ -211,12 +211,12 @@ describe("renderRecipe", () => {
       ],
     );
     assert.equal(
-      stages(columns[0] as FakeElement)[0]?.style.values.get("--yv-color"),
-      stages(columns[0] as FakeElement)[1]?.style.values.get("--yv-color"),
+      stages(columns[0] as FakeElement)[0]?.style.values.get("--yv-fill"),
+      stages(columns[0] as FakeElement)[1]?.style.values.get("--yv-fill"),
     );
     assert.notEqual(
-      stages(columns[0] as FakeElement)[0]?.style.values.get("--yv-color"),
-      stages(columns[1] as FakeElement)[0]?.style.values.get("--yv-color"),
+      stages(columns[0] as FakeElement)[0]?.style.values.get("--yv-fill"),
+      stages(columns[1] as FakeElement)[0]?.style.values.get("--yv-fill"),
     );
   });
 });

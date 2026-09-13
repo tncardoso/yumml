@@ -1,26 +1,27 @@
 import { format } from "./model/fraction.ts";
 import type { IngredientNode, Recipe, StepNode } from "./model/recipe.ts";
+import {
+  columnColor,
+  RECIPE_COLORS,
+  type RecipeColors,
+  recipeColors,
+  stageColumns,
+} from "./render/palette.ts";
 
+export type { RecipeColor, RecipeColors, StageColumns } from "./render/palette.ts";
 /**
  * The drawing's colours are part of this entry too: a caller that renders the flow
  * itself needs the same ten hues core paints the bands in, and the same row tints the
  * chips wear.
  */
-export type { RecipeColor, RecipeColors, StageColumns } from "./render/palette.ts";
-export {
-  columnColor,
-  RECIPE_COLORS,
-  recipeColors,
-  stageColumns,
-} from "./render/palette.ts";
-
-const COLORS = ["#168477", "#397da8", "#6555a6", "#9f4f79", "#b9682f"] as const;
+export { columnColor, RECIPE_COLORS, recipeColors, stageColumns };
 
 const STYLES = `
 .yumml-vis {
   --yv-ink: #22303c;
   --yv-line: #d8d9d5;
   --yv-paper: #fffdfa;
+  --yv-focus: #025956;
   --yv-row-height: clamp(3.25rem, 4.5vw, 3.75rem);
   container-type: inline-size;
   box-sizing: border-box;
@@ -41,20 +42,29 @@ const STYLES = `
 .yumml-vis .yv-prep-item { display: flex; align-items: center; gap: .85rem; min-height: 3.75rem; border: 1px solid var(--yv-line); border-radius: 1rem; background: var(--yv-paper); padding: .65rem 1rem; font-weight: 700; box-shadow: 0 .15rem .5rem rgb(34 48 60 / 4%); }
 .yumml-vis .yv-number { display: inline-grid; flex: none; width: 2rem; height: 2rem; place-items: center; border-radius: 50%; background: var(--yv-ink); color: white; font-variant-numeric: tabular-nums; }
 .yumml-vis .yv-viewport { margin: 0 clamp(.75rem, 2vw, 2rem) clamp(.75rem, 2vw, 2rem); overflow-x: auto; border: 1px solid var(--yv-line); border-radius: 1.25rem; background: var(--yv-paper); scrollbar-color: #aeb4b6 transparent; }
-.yumml-vis .yv-viewport:focus-visible { outline: .2rem solid #397da8; outline-offset: .15rem; }
+/* The ring is the page's, not the recipe's: it is the same action colour the cookbook uses. */
+.yumml-vis .yv-viewport:focus-visible { outline: .2rem solid var(--yv-focus); outline-offset: .15rem; }
 .yumml-vis .yv-flow { display: grid; width: 100%; grid-template-columns: clamp(16rem, 40cqi, 40rem) minmax(0, 1fr); padding: 1rem; }
 .yumml-vis .yv-ingredients { position: relative; z-index: 2; overflow: hidden; border: 1px solid #cfd4d3; border-radius: .7rem 0 0 .7rem; }
-.yumml-vis .yv-ingredient { display: flex; min-height: var(--yv-row-height); align-items: center; gap: .45rem; border-bottom: 1px solid #cfd4d3; background: #f7faf9; background: color-mix(in srgb, var(--yv-row-color) 8%, white); padding: .6rem .85rem; font-size: .9rem; line-height: 1.25; }
+.yumml-vis .yv-ingredient { display: flex; min-height: var(--yv-row-height); align-items: center; gap: .45rem; border-bottom: 1px solid #cfd4d3; background: var(--yv-row-tint); padding: .6rem .85rem; font-size: .9rem; line-height: 1.25; }
 .yumml-vis .yv-ingredient:last-child { border-bottom: 0; }
 .yumml-vis .yv-quantity { flex: none; font-weight: 750; }
 .yumml-vis .yv-empty { color: #68727a; font-style: italic; }
 .yumml-vis .yv-stages { display: grid; min-width: 0; grid-template-columns: repeat(var(--yv-stage-count), minmax(6rem, 1fr)); }
 .yumml-vis .yv-stage-column { display: grid; min-width: 0; grid-template-columns: repeat(var(--yv-lane-count), minmax(0, 1fr)); grid-template-rows: repeat(var(--yv-row-count), var(--yv-row-height)); }
 .yumml-vis .yv-stage { display: grid; min-width: 0; grid-template-rows: repeat(var(--yv-row-count), var(--yv-row-height)); }
-.yumml-vis .yv-stage-band { position: relative; display: grid; min-height: var(--yv-row-height); place-items: center; border-inline-start: 1px solid rgb(0 0 0 / 18%); background: var(--yv-color); color: white; text-align: center; }
-.yumml-vis .yv-stage-arrow { z-index: 3; align-self: center; justify-self: end; width: 1.6rem; height: 1.6rem; margin-right: -.8rem; background: var(--yv-color); clip-path: polygon(0 0, 100% 50%, 0 100%, 25% 50%); pointer-events: none; }
+/* A band is a pastel, so its words are the hue's own ink and never white. */
+.yumml-vis .yv-stage-band { position: relative; display: grid; min-height: var(--yv-row-height); place-items: center; border-inline-start: 1px solid color-mix(in srgb, var(--yv-on-fill) 28%, transparent); background: var(--yv-fill); color: var(--yv-on-fill); text-align: center; }
+/*
+  The chevron points into the next column, so it is outlined on the side that overlaps
+  it: the board strokes the band and its point as one shape, and a line between a band
+  and its own chevron would be a seam the drawing does not have. Two pastel fills of
+  the same lightness is a hue-only edge, and this is what keeps the point a point for a
+  reader who cannot see that hue.
+*/
+.yumml-vis .yv-stage-arrow { z-index: 3; align-self: center; justify-self: end; width: 1.6rem; height: 1.6rem; margin-right: -.8rem; background: var(--yv-fill); clip-path: polygon(0 0, 100% 50%, 0 100%, 25% 50%); filter: drop-shadow(1px 0 0 color-mix(in srgb, var(--yv-on-fill) 40%, transparent)); pointer-events: none; }
 .yumml-vis .yv-stage-content { position: sticky; left: 0; z-index: 4; display: grid; max-width: 100%; justify-items: center; gap: .2rem; padding: .35rem .3rem; }
-.yumml-vis .yv-stage .yv-number { width: 1.7rem; height: 1.7rem; background: white; color: var(--yv-color); font-weight: 800; }
+.yumml-vis .yv-stage .yv-number { width: 1.7rem; height: 1.7rem; background: var(--yv-paper); color: var(--yv-on-fill); font-weight: 800; }
 .yumml-vis .yv-stage-label { overflow-wrap: anywhere; font-size: clamp(.72rem, 1.4vw, .9rem); font-weight: 750; line-height: 1.08; }
 .yumml-vis .yv-duration { font-size: .7rem; font-weight: 650; opacity: .9; }
 .yumml-vis .yv-no-stages { display: grid; place-items: center; color: #68727a; font-size: .875rem; }
@@ -131,24 +141,6 @@ type StagePlacement = {
   readonly end: number;
   readonly lane: number;
 };
-
-/** Groups non-preparation steps into their earliest topological columns. */
-function stageColumns(orderedSteps: readonly StepNode[]): StageColumn[] {
-  const depths = new Map<string, number>();
-  const columns: StepNode[][] = [];
-  for (const step of orderedSteps) {
-    if (step.uses.length === 0) continue;
-    const depth = step.uses.reduce(
-      (latest, draw) => Math.max(latest, (depths.get(draw.id) ?? -1) + 1),
-      0,
-    );
-    depths.set(step.id, depth);
-    const column = columns[depth];
-    if (column === undefined) columns[depth] = [step];
-    else column.push(step);
-  }
-  return columns;
-}
 
 /** Orders ingredient rows by walking each terminal branch back to its sources. */
 function orderedIngredients(
@@ -243,9 +235,8 @@ function appendPreparation(
 function fillIngredients(
   document: Document,
   list: HTMLElement,
-  recipe: Recipe,
   ingredients: readonly IngredientNode[],
-  stageIndex: ReadonlyMap<string, number>,
+  colors: RecipeColors,
 ): void {
   if (ingredients.length === 0) {
     list.append(element(document, "div", "yv-ingredient yv-empty", "No ingredients"));
@@ -255,14 +246,10 @@ function fillIngredients(
     const row = element(document, "div", "yv-ingredient");
     row.dataset.nodeId = ingredient.id;
     row.setAttribute("role", "listitem");
-    const colorIndex =
-      recipe.consumers[ingredient.id]
-        ?.map((consumer) => stageIndex.get(consumer))
-        .find((index): index is number => index !== undefined) ?? 0;
-    row.style.setProperty(
-      "--yv-row-color",
-      COLORS[colorIndex % COLORS.length] ?? COLORS[0],
-    );
+    // Every ingredient of a recipe that parsed has a colour; the first column's is the
+    // one a model that did not come from the parser falls back to.
+    const color = colors.ingredients.get(ingredient.id) ?? columnColor(0);
+    row.style.setProperty("--yv-row-tint", color.tint);
     const [quantity, description] = displayIngredient(ingredient);
     if (quantity !== "") row.append(element(document, "span", "yv-quantity", quantity));
     row.append(element(document, "span", "yv-ingredient-label", description));
@@ -290,7 +277,9 @@ function fillStages(
   );
   const ancestorCache = new Map<string, ReadonlySet<string>>();
   for (const [index, stages] of columns.entries()) {
-    const color = COLORS[index % COLORS.length] ?? COLORS[0];
+    // One hue per column, laps included: `columnColor` is what `recipeColors` reads
+    // too, so a band and the chip that names its ingredient cannot drift apart.
+    const color = columnColor(index);
     const placements = stagePlacements(
       stages,
       ingredientIds,
@@ -307,12 +296,14 @@ function fillStages(
     for (const { step, start, end, lane } of placements) {
       const stage = element(document, "div", "yv-stage");
       stage.dataset.nodeId = step.id;
-      stage.style.setProperty("--yv-color", color);
+      stage.style.setProperty("--yv-fill", color.fill);
+      stage.style.setProperty("--yv-on-fill", color.ink);
       stage.style.setProperty("grid-column", String(lane + 1));
       stage.style.setProperty("grid-row", `1 / span ${rowCount}`);
+      // The band and the number inherit the two roles off the stage; the chevron is a
+      // sibling of the stage, so it takes its own copy.
       const band = element(document, "div", "yv-stage-band");
       band.style.setProperty("grid-row", `${start + 1} / span ${end - start + 1}`);
-      band.style.setProperty("--yv-color", color);
       const content = element(document, "div", "yv-stage-content");
       content.append(
         element(document, "span", "yv-number", String(numbers.get(step.id))),
@@ -329,7 +320,8 @@ function fillStages(
       if (index < columns.length - 1) {
         const arrow = element(document, "div", "yv-stage-arrow");
         arrow.setAttribute("aria-hidden", "true");
-        arrow.style.setProperty("--yv-color", color);
+        arrow.style.setProperty("--yv-fill", color.fill);
+        arrow.style.setProperty("--yv-on-fill", color.ink);
         arrow.style.setProperty("grid-column", "1 / -1");
         arrow.style.setProperty("grid-row", `${start + 1} / span ${end - start + 1}`);
         column.append(arrow);
@@ -354,9 +346,7 @@ export function renderRecipe(recipe: Recipe, target: HTMLElement): HTMLElement {
   const prep = orderedSteps.filter((step) => step.uses.length === 0);
   const columns = stageColumns(orderedSteps);
   const ingredients = orderedIngredients(recipe, orderedSteps);
-  const stageIndex = new Map(
-    columns.flatMap((stages, index) => stages.map((step) => [step.id, index] as const)),
-  );
+  const colors = recipeColors(recipe);
   const rowCount = Math.max(ingredients.length, 1);
   const stageCount = Math.max(columns.length, 1);
 
@@ -388,7 +378,7 @@ export function renderRecipe(recipe: Recipe, target: HTMLElement): HTMLElement {
   const ingredientList = element(document, "div", "yv-ingredients");
   ingredientList.setAttribute("role", "list");
 
-  fillIngredients(document, ingredientList, recipe, ingredients, stageIndex);
+  fillIngredients(document, ingredientList, ingredients, colors);
 
   const stageList = element(document, "div", "yv-stages");
   fillStages(document, stageList, ingredients, columns, stepById, numbers, rowCount);
