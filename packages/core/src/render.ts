@@ -78,6 +78,15 @@ const STYLES = `
 @media (prefers-reduced-motion: no-preference) {
   .yumml-vis .yv-viewport { scroll-behavior: smooth; }
 }
+/*
+  A high-contrast mode throws the fills away and takes the shape of a band with them.
+  The labels survive on their own; the outline is what keeps a band a band, and a row
+  a row.
+*/
+@media (forced-colors: active) {
+  .yumml-vis .yv-stage-band,
+  .yumml-vis .yv-prep-item { border: 1px solid CanvasText; }
+}
 `;
 
 function element<K extends keyof HTMLElementTagNameMap>(
