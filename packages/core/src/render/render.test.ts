@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
-import { parseRecipe } from "../index.ts";
-import { renderRecipe } from "../render.ts";
+import { parseRecipe, renderRecipe } from "../index.ts";
 
 class FakeStyle {
   readonly values = new Map<string, string>();

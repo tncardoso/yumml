@@ -70,6 +70,10 @@ parse file:
 parse-json file:
     @{{dev}} parse {{file}} --json
 
+# Serve a directory (or one file) as a cookbook, and reload it as you edit.
+cookbook dir:
+    @{{dev}} cookbook {{dir}}
+
 # ------------------------------------------------------------- packaging ---
 
 # Build, then pack both packages into .pack/ for inspection.

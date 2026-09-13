@@ -1,7 +1,7 @@
 /**
  * Recipe identifiers.
  *
- * Ingredients and steps share one id namespace (plan.md D10), so a typo in
+ * Ingredients and steps share one id namespace, so a typo in
  * `uses` is never ambiguous, and a duplicate id is an error across both lists.
  * The pattern is deliberately narrow: kebab-case ASCII, which keeps ids usable
  * as anchors, map keys and CSS selectors in the renderer.

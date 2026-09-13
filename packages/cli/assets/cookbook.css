@@ -1,0 +1,1119 @@
+/* ------------------------------------------------------------------ tokens */
+/*
+  The cookbook's stylesheet, hand-written from the Penpot boards
+  (refs/cookbook-recipe-list.html and the flow board in refs/example.html).
+
+  Every colour, radius and type size below was read off a board. The layout is
+  not: the boards are pictures of a 1600px artboard with every element absolutely
+  positioned, and a page that behaves on a laptop cannot be that. The rule from
+  The chrome is fluid and matches the boards at 1600px,
+  and only the flow keeps exact coordinates — those are in the SVG, emitted by
+  `render/flow.ts`.
+*/
+
+:root {
+  --canvas: #efece6;
+  --surface: #ffffff;
+  --ink: #22303c;
+  --muted: #8a939b;
+  --rule: #e8e4dc;
+  --chip: #f4f1ec;
+  --teal: #2c8c7d;
+  --teal-soft: #e4f1ee;
+  --rose: #a25179;
+  --rose-soft: #f7f0f4;
+
+  --page-max: 1440px;
+  --page-pad: 80px;
+  --radius-card: 20px;
+  --radius-panel: 24px;
+  --radius-chip: 999px;
+
+  --font:
+    "Inter Tight", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    sans-serif;
+
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* --------------------------------------------------------------------- nav */
+
+.nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--rule);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 18px var(--page-pad);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--teal);
+  font-size: 17px;
+  line-height: 1;
+}
+
+.brand-word {
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-right: 20px;
+}
+
+/* The wordmark and the one link there is sit at 12px from `.brand`'s gap; the
+   link adds its own 20px so the logo and `Home` read as two things, at the 32px
+   the nav's own gutter uses. */
+.nav-link {
+  margin-left: 20px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.nav-link[aria-current="page"] {
+  color: var(--ink);
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  width: 340px;
+  padding: 4px 4px 4px 16px;
+  border-radius: var(--radius-chip);
+  background: var(--chip);
+}
+
+.search-input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 15px;
+}
+
+.search-input::placeholder {
+  color: var(--muted);
+}
+
+.search-input:focus {
+  outline: none;
+}
+
+.search-button {
+  border: 0;
+  border-radius: var(--radius-chip);
+  padding: 6px 14px;
+  background: var(--ink);
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.nav-count {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------- main */
+
+.main {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 48px var(--page-pad) 80px;
+}
+
+.hero {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.hero-title {
+  margin: 0;
+  font-size: 52px;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.stats {
+  display: flex;
+  gap: 48px;
+  margin-top: 20px;
+}
+
+.stat {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.stat-number {
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.stat--broken .stat-number {
+  color: var(--rose);
+}
+
+/* ------------------------------------------------------------------- chips */
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+
+.chip {
+  display: inline-block;
+  padding: 7px 14px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-chip);
+  background: var(--surface);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.chip--current {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: #fff;
+}
+
+.chip--quiet {
+  border-color: transparent;
+  background: var(--chip);
+  color: var(--muted);
+}
+
+.chip--broken {
+  border-color: transparent;
+  background: var(--rose-soft);
+  color: var(--rose);
+  font-weight: 600;
+}
+
+/* ----------------------------------------------------------------- results */
+
+.results-head {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.results-title {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 600;
+}
+
+.results-clear {
+  font-size: 14px;
+  color: var(--muted);
+  text-decoration: underline;
+}
+
+.empty {
+  margin: 0;
+  max-width: 640px;
+  font-size: 17px;
+  color: var(--muted);
+}
+
+.notice {
+  margin: 0 0 24px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: var(--rose-soft);
+  color: var(--rose);
+  font-size: 15px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+/* ------------------------------------------------------------------- cards */
+
+.card {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  overflow: hidden;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgb(34 48 60 / 10%);
+}
+
+.card-flow {
+  /* A window onto the top of the flow: tall enough for the preparation cards and
+     the first few ingredient rows, which is the part that reads at this size. */
+  height: 148px;
+  overflow: hidden;
+  background: var(--canvas);
+  border-bottom: 1px solid var(--rule);
+}
+
+.card-flow--broken {
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  padding: 20px 22px;
+  background: var(--surface);
+}
+
+.card-diagnostic,
+.card-diagnostic-message,
+.card-more {
+  margin: 0;
+}
+
+.card-diagnostic-message {
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.card-more {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.card-body {
+  display: grid;
+  gap: 6px;
+  padding: 18px 22px 4px;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.card-meta {
+  margin: 0;
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 22px 20px;
+}
+
+/* ------------------------------------------------------------- recipe page */
+
+.recipe-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 440px;
+  gap: 40px;
+  align-items: start;
+  margin-bottom: 40px;
+}
+
+.recipe-heading {
+  display: grid;
+  gap: 14px;
+  max-width: 900px;
+}
+
+.recipe-title {
+  margin: 0;
+  font-size: 44px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.recipe-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+}
+
+.recipe-meta .chip {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.source {
+  display: grid;
+  gap: 6px;
+  padding: 20px 24px;
+  border: 1px solid var(--rule);
+  border-radius: 20px;
+  background: var(--surface);
+}
+
+.source-file {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.source-file a {
+  text-decoration: underline;
+  text-decoration-color: var(--rule);
+  text-underline-offset: 3px;
+}
+
+.source-line {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* -------------------------------------------------------------- timer bar */
+
+.timer {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px;
+  border-radius: var(--radius-panel);
+  background: var(--ink);
+  color: #fff;
+}
+
+.timer button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 14px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.timer button:disabled {
+  cursor: default;
+}
+
+.timer-prev {
+  padding: 0 20px;
+  height: 48px;
+  background: rgb(255 255 255 / 10%);
+}
+
+.timer-chevron {
+  font-size: 17px;
+  line-height: 1;
+}
+
+.timer-badge {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin: 0;
+  border-radius: 14px;
+  background: var(--teal);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.timer-where {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  max-width: 460px;
+}
+
+.timer-position {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #8e9ba6;
+}
+
+.timer-name {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.timer-dots {
+  display: flex;
+  gap: 10px;
+  margin: 2px 0 0;
+}
+
+.timer-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-chip);
+  background: rgb(255 255 255 / 28%);
+}
+
+.timer-dot--on {
+  background: var(--teal);
+}
+
+.timer-clock {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  margin-left: auto;
+}
+
+.timer-digits {
+  margin: 0;
+  font-size: 38px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* The countdown reached zero, and does not advance the step on its own. */
+.timer-digits--done {
+  padding: 0 12px;
+  border-radius: 12px;
+  background: var(--teal);
+}
+
+.timer-track {
+  width: 180px;
+  height: 6px;
+  margin: 0;
+  border-radius: var(--radius-chip);
+  background: rgb(255 255 255 / 16%);
+  overflow: hidden;
+}
+
+.timer-progress {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--teal);
+}
+
+.timer-play {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-chip);
+  background: var(--teal);
+}
+
+/* Two bars, the way the board's pause glyph is drawn. */
+.timer-play-glyph {
+  width: 6px;
+  height: 20px;
+  border-left: 6px solid #fff;
+  border-right: 6px solid #fff;
+}
+
+/*
+  The board draws the running state, because its timer is running. A timer at rest
+  gets the triangle instead, so the button says what clicking it will do.
+*/
+.timer-play[data-playing="false"] .timer-play-glyph {
+  width: 0;
+  height: 0;
+  margin-left: 3px;
+  border: 0;
+  border-top: 11px solid transparent;
+  border-bottom: 11px solid transparent;
+  border-left: 18px solid #fff;
+}
+
+.timer-add {
+  height: 48px;
+  padding: 0 18px;
+  background: rgb(255 255 255 / 10%);
+}
+
+/*
+  The one control the board does not have, because a sound nobody can silence is
+  worse than one extra button. Its label is the thing it enables, so `muted`
+  is drawn as that label struck out.
+*/
+.timer-mute {
+  height: 48px;
+  padding: 0 18px;
+  background: rgb(255 255 255 / 10%);
+}
+
+.timer-mute[data-muted="true"] {
+  color: #8e9ba6;
+  text-decoration: line-through;
+}
+
+/*
+  The one button in the bar with a light background, so its label takes the ink
+  rather than the bar's white. `.timer button` sets that white for the rest of
+  them and outranks a lone class (0-1-1 against 0-1-0), which is why this one is
+  written as a descendant: without the extra `.timer`, `Next step` was white on
+  white.
+*/
+.timer .timer-next {
+  height: 48px;
+  padding: 0 24px;
+  background: #fff;
+  color: var(--ink);
+}
+
+/* ---------------------------------------------------------- current step */
+
+.strip {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-top: 24px;
+  padding: 24px 32px;
+  border-radius: 20px;
+  background: var(--surface);
+}
+
+/*
+  Every step's strip is rendered and all but the current one is hidden. `hidden`
+  is a `display: none` from the browser's own sheet, and `.strip` sets
+  `display: flex` from this one — the author rule wins, so the attribute has to be
+  said again here or the hidden strips would show.
+*/
+.strip[hidden] {
+  display: none;
+}
+
+.strip-badge {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  border-radius: 12px;
+  background: var(--teal);
+  color: #fff;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.strip-text {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.strip-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.strip-uses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+}
+
+.uses-chip {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.uses-none {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* The step's own time, or the fact that it has none: pushed to the far end. */
+.strip-time {
+  margin: 0 0 0 auto;
+  flex: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* ------------------------------------------------------------ flow panel */
+
+.flow-panel {
+  margin-top: 24px;
+  padding: 32px;
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+}
+
+.flow-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: 24px;
+}
+
+.flow-title {
+  margin: 0 0 6px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.flow-sub {
+  margin: 0;
+  max-width: 760px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.legend {
+  display: flex;
+  gap: 20px;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.legend-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.legend-swatch--step {
+  background: var(--teal);
+}
+
+.legend-swatch--row {
+  background: #eef4f7;
+}
+
+.legend-swatch--prep {
+  background: var(--ink);
+}
+
+/* ------------------------------------------------------------ diagnostics */
+
+.diagnostics {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.diagnostic {
+  display: grid;
+  gap: 12px;
+  padding: 24px 28px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.diagnostic p {
+  margin: 0;
+}
+
+.diagnostic-frame {
+  margin: 0;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: #2b3a47;
+  color: #eef1f3;
+  font-family: ui-monospace, "SFMono-Regular", "JetBrains Mono", Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+/* -------------------------------------------------------------------- flow */
+/*
+  The drawing itself. Geometry comes from the SVG's own attributes; only ink,
+  type and the hiding of labels at thumbnail size belong here.
+
+  A card hides every text node: a 20px ingredient name scaled to a 450px card is
+  five pixels tall, and the shape is what the thumbnail is for.
+*/
+
+.flow {
+  display: block;
+  font-family: var(--font);
+}
+
+.card-flow .flow {
+  width: 100%;
+  height: auto;
+}
+
+.card-flow .flow-text {
+  display: none;
+}
+
+/* Core mounts the same client-side visualization in cards and detail pages. */
+.card-flow > .yumml-vis {
+  min-height: 100%;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.card-flow .yumml-vis .yv-header,
+.card-flow .yumml-vis .yv-prep {
+  display: none;
+}
+
+.card-flow .yumml-vis .yv-viewport {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+.card-flow .yumml-vis .yv-flow {
+  grid-template-columns: minmax(8rem, 2fr) minmax(0, 1fr);
+  padding: 0;
+}
+
+.card-flow .yumml-vis .yv-ingredient {
+  min-height: 2.5rem;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.7rem;
+}
+
+:where(.card-flow) .yumml-vis .yv-stage {
+  grid-template-rows: repeat(var(--yv-row-count), 2.5rem);
+}
+
+.card-flow .yumml-vis .yv-stage-content {
+  gap: 0.15rem;
+  padding: 0.3rem;
+}
+
+.card-flow .yumml-vis .yv-number {
+  width: 1.4rem;
+  height: 1.4rem;
+  font-size: 0.7rem;
+}
+
+.card-flow .yumml-vis .yv-stage-label,
+.card-flow .yumml-vis .yv-duration {
+  display: none;
+}
+
+.flow-frame {
+  overflow-x: auto;
+}
+
+.flow-frame .flow {
+  width: 100%;
+  height: auto;
+  max-width: var(--flow-width);
+}
+
+.flow-frame .flow[data-wide="true"] {
+  /* A long recipe keeps its size and the panel scrolls, instead of shrinking to
+     the point where the labels are grey paste. */
+  max-width: none;
+  width: var(--flow-width);
+}
+
+.flow-frame > .yumml-vis {
+  box-shadow: none;
+}
+
+/*
+  A column is how the script walks the recipe, and the pointer says so — but only
+  once the script is there. A picture that cannot be clicked should not offer.
+*/
+.has-script .flow-band,
+.has-script .flow-prep,
+.has-script .yv-stage,
+.has-script .yv-prep-item {
+  cursor: pointer;
+}
+
+.flow-frame .yv-stage.cookbook-flow-current .yv-stage-band,
+.flow-frame .yv-prep-item.cookbook-flow-current {
+  outline: 3px solid var(--teal);
+  outline-offset: -3px;
+  z-index: 5;
+}
+
+.flow-panel {
+  fill: var(--surface);
+}
+
+.flow-prep-card {
+  fill: var(--surface);
+  stroke: var(--rule);
+  stroke-width: 1;
+}
+
+.flow-prep-number {
+  fill: var(--ink);
+}
+
+.flow-prep-index {
+  fill: #fff;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.flow-prep-text {
+  fill: var(--ink);
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.flow-row-label {
+  fill: var(--ink);
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.flow-band-number {
+  fill: var(--surface);
+}
+
+.flow-band-index {
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.flow-band-label {
+  fill: #fff;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.flow-band-time {
+  fill: rgb(255 255 255 / 80%);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* ------------------------------------------------------------------ footer */
+
+.footer {
+  background: var(--surface);
+  border-top: 1px solid var(--rule);
+}
+
+.footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 28px var(--page-pad) 40px;
+}
+
+.footer-note,
+.footer-links {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.footer-links {
+  display: flex;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.footer-links a {
+  text-decoration: underline;
+}
+
+/* --------------------------------------------------------------- narrower */
+
+@media (max-width: 1100px) {
+  :root {
+    --page-pad: 40px;
+  }
+
+  .recipe-head {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .timer {
+    flex-wrap: wrap;
+  }
+
+  .timer-where {
+    max-width: none;
+  }
+
+  .cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hero-title {
+    font-size: 40px;
+  }
+}
+
+@media (max-width: 760px) {
+  :root {
+    --page-pad: 20px;
+  }
+
+  .nav-inner {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .search {
+    order: 3;
+    width: 100%;
+  }
+
+  .main {
+    padding-top: 32px;
+  }
+
+  .cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hero-title {
+    font-size: 32px;
+  }
+
+  .recipe-title {
+    font-size: 32px;
+  }
+
+  .timer-clock {
+    margin-left: 0;
+  }
+
+  .timer-next {
+    width: 100%;
+  }
+
+  .flow-panel {
+    padding: 20px;
+  }
+
+  .flow-head {
+    flex-direction: column;
+  }
+
+  .stats {
+    gap: 32px;
+  }
+
+  .footer-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+}

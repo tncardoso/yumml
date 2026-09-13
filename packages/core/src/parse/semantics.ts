@@ -7,10 +7,10 @@
  * arithmetic meaningless, so reporting both would bury the real mistake under
  * cascades.
  *
- * The ledger rule is plan.md §11, the normative one: for each quantified
+ * The ledger rule is: for each quantified
  * ingredient, the sum of the draws that target it must equal its declared
  * quantity exactly, with a bare draw counting as the whole amount. Only
- * ingredients are quantified (D26), so this is a per-ingredient sum and never
+ * ingredients are quantified, so this is a per-ingredient sum and never
  * depends on the order of the steps.
  */
 
@@ -43,7 +43,7 @@ function indexNodes(model: RecipeInput): Map<string, NodeRef> {
   return ids;
 }
 
-/** Duplicate ids, across ingredients and steps together (D10). */
+/** Duplicate ids, across ingredients and steps together. */
 function checkIds(model: RecipeInput): Diagnostic[] {
   const diagnostics: Diagnostic[] = [];
   const seen = new Set<string>();
@@ -70,7 +70,7 @@ function checkIds(model: RecipeInput): Diagnostic[] {
   return diagnostics;
 }
 
-/** Every `uses` entry resolves, and only ingredients carry an amount (D28). */
+/** Every `uses` entry resolves, and only ingredients carry an amount. */
 function checkReferences(model: RecipeInput, ids: Map<string, NodeRef>): Diagnostic[] {
   const diagnostics: Diagnostic[] = [];
   const allIds = [...ids.keys()];
@@ -264,7 +264,7 @@ function checkLedger(
   return { diagnostics, ledger };
 }
 
-/** Cooking order: producers first, file order among independent steps (D18). */
+/** Cooking order: producers first, file order among independent steps. */
 function topologicalOrder(
   steps: readonly StepNode[],
   ids: Map<string, NodeRef>,
@@ -277,7 +277,7 @@ function topologicalOrder(
   const remaining = steps.map((step) => step.id);
 
   while (remaining.length > 0) {
-    // Scan in file order each round, so independent steps keep their order (D18).
+    // Scan in file order each round, so independent steps keep their order.
     const ready = remaining.filter((id) => (pending.get(id)?.size ?? 0) === 0);
     if (ready.length === 0) break; // a cycle; analyze reported it already
     for (const id of ready) {

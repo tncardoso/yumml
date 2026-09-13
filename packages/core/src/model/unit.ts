@@ -1,9 +1,9 @@
 /**
  * The closed unit registry.
  *
- * `unit` is a closed enum in v1 (plan.md §3.4, D2): a typo in a unit is exactly
+ * `unit` is a closed enum in v1: a typo in a unit is exactly
  * the kind of mistake the strict parser exists to catch, and conversion needs a
- * known list. Both US and metric units are present (D7).
+ * known list. Both US and metric units are present.
  *
  * Each unit knows its system, its dimension, and — for units that measure a
  * continuous quantity — an exact decimal factor towards the canonical base
@@ -11,7 +11,7 @@
  * convert: a `clove` is not a volume.
  *
  * Conversion is for display only. The ledger never converts, because every draw
- * inherits its target's unit (D28), so all ledger arithmetic happens inside one
+ * inherits its target's unit, so all ledger arithmetic happens inside one
  * unit.
  */
 

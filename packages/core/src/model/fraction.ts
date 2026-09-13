@@ -1,7 +1,7 @@
 /**
  * Exact rational arithmetic for recipe quantities.
  *
- * Recipes are checked with the ledger rule of plan.md §11: the amounts drawn
+ * Recipes are checked with the ledger rule: the amounts drawn
  * from an ingredient must sum to exactly its declared quantity. Floating point
  * cannot answer that question (`0.1 + 0.2 !== 0.3`), so every quantity in yumml
  * is a {@link Fraction} — a normalized pair of safe integers — and never a

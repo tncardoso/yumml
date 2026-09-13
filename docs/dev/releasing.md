@@ -99,11 +99,5 @@ A published version cannot be replaced on npm, and the tag is not rewritten.
 If `verify` fails on the tag, nothing was published, so recovery is free: delete
 the tag (`git push --delete origin v0.2.0`), fix, and tag again.
 
-## Where the rest is
-
-This file is the do-this. The decisions behind it — why publishing goes through
-pnpm, why the workflow is pinned to commit SHAs, what has to be configured on
-npm before the first release — are in [`plan-ci.md`](../../plan-ci.md).
-
 [kac]: https://keepachangelog.com/en/1.1.0/
 [semver]: https://semver.org/spec/v2.0.0.html

@@ -1,11 +1,11 @@
 /**
  * Step timers.
  *
- * A `time` on a step is a hint for the viewer's per-step timer (plan.md D4): it
+ * A `time` on a step is a hint for the viewer's per-step timer: it
  * is not a dependency, not a schedule, and it never affects the DAG or the
  * ledger. Durations are normalized to whole seconds.
  *
- * Accepted forms (plan.md §3.6 / D22):
+ * Accepted forms:
  * - a YAML number, read as minutes: `time: 5`
  * - the compact form: `5m`, `90s`, `1h30m`, `1h 30m`
  * - ISO 8601: `PT5M`, `PT1H30M`, `P1DT2H`

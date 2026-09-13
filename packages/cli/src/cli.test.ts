@@ -48,10 +48,13 @@ type Run = {
   err: string;
 };
 
-function run(argv: readonly string[], files: Record<string, string> = {}): Run {
+async function run(
+  argv: readonly string[],
+  files: Record<string, string> = {},
+): Promise<Run> {
   let out = "";
   let err = "";
-  const code = runCli({
+  const code = await runCli({
     argv,
     readFile: (path) => {
       const file = files[path];
@@ -71,15 +74,15 @@ function run(argv: readonly string[], files: Record<string, string> = {}): Run {
 }
 
 describe("yumml validate", () => {
-  test("a valid recipe exits 0", () => {
-    const result = run(["validate", "toast.yaml"], { "toast.yaml": VALID });
+  test("a valid recipe exits 0", async () => {
+    const result = await run(["validate", "toast.yaml"], { "toast.yaml": VALID });
     assert.equal(result.code, EXIT_OK);
     assert.equal(result.out, "toast.yaml: valid\n");
     assert.equal(result.err, "");
   });
 
-  test("a broken recipe exits 1 and prints a code frame per problem", () => {
-    const result = run(["validate", "toast.yaml"], { "toast.yaml": INVALID_SHAPE });
+  test("a broken recipe exits 1 and prints a code frame per problem", async () => {
+    const result = await run(["validate", "toast.yaml"], { "toast.yaml": INVALID_SHAPE });
     assert.equal(result.code, EXIT_DIAGNOSTICS);
     assert.match(result.err, /schema\/out-of-range/);
     assert.match(result.err, /schema\/invalid-unit/);
@@ -88,16 +91,16 @@ describe("yumml validate", () => {
     assert.equal(result.out, "");
   });
 
-  test("a reference problem is reported once the shape is sound", () => {
-    const result = run(["validate", "toast.yaml"], { "toast.yaml": INVALID_REFS });
+  test("a reference problem is reported once the shape is sound", async () => {
+    const result = await run(["validate", "toast.yaml"], { "toast.yaml": INVALID_REFS });
     assert.equal(result.code, EXIT_DIAGNOSTICS);
     assert.match(result.err, /ref\/unresolved/);
     assert.match(result.err, /8 \| {5}uses: \[bread, butter\]/);
     assert.match(result.err, /1 problem\n/);
   });
 
-  test("--json prints diagnostics an editor can read", () => {
-    const result = run(["validate", "toast.yaml", "--json"], {
+  test("--json prints diagnostics an editor can read", async () => {
+    const result = await run(["validate", "toast.yaml", "--json"], {
       "toast.yaml": INVALID_REFS,
     });
     assert.equal(result.code, EXIT_DIAGNOSTICS);
@@ -115,8 +118,10 @@ describe("yumml validate", () => {
     assert.equal(payload.diagnostics[0]?.loc?.line, 8);
   });
 
-  test("--json on a valid recipe still reports ok", () => {
-    const result = run(["validate", "toast.yaml", "--json"], { "toast.yaml": VALID });
+  test("--json on a valid recipe still reports ok", async () => {
+    const result = await run(["validate", "toast.yaml", "--json"], {
+      "toast.yaml": VALID,
+    });
     assert.equal(result.code, EXIT_OK);
     assert.deepEqual(JSON.parse(result.out), {
       ok: true,
@@ -125,22 +130,22 @@ describe("yumml validate", () => {
     });
   });
 
-  test("reads standard input when the file is -", () => {
-    const result = run(["validate", "-"], { "-": VALID });
+  test("reads standard input when the file is -", async () => {
+    const result = await run(["validate", "-"], { "-": VALID });
     assert.equal(result.code, EXIT_OK);
     assert.equal(result.out, "-: valid\n");
   });
 
-  test("a missing file is a usage error, not a diagnostic", () => {
-    const result = run(["validate", "nope.yaml"]);
+  test("a missing file is a usage error, not a diagnostic", async () => {
+    const result = await run(["validate", "nope.yaml"]);
     assert.equal(result.code, EXIT_USAGE);
     assert.match(result.err, /cannot read nope\.yaml/);
   });
 });
 
 describe("yumml parse", () => {
-  test("prints the model as JSON", () => {
-    const result = run(["parse", "toast.yaml"], { "toast.yaml": VALID });
+  test("prints the model as JSON", async () => {
+    const result = await run(["parse", "toast.yaml"], { "toast.yaml": VALID });
     assert.equal(result.code, EXIT_OK);
     const recipe = JSON.parse(result.out) as {
       title: string;
@@ -163,8 +168,10 @@ describe("yumml parse", () => {
     ]);
   });
 
-  test("--summary prints a readable outline", () => {
-    const result = run(["parse", "toast.yaml", "--summary"], { "toast.yaml": VALID });
+  test("--summary prints a readable outline", async () => {
+    const result = await run(["parse", "toast.yaml", "--summary"], {
+      "toast.yaml": VALID,
+    });
     assert.equal(result.code, EXIT_OK);
     assert.match(result.out, /^Toast \(servings: 2\)/);
     assert.match(result.out, /^ {2}2 slice {2}bread$/m);
@@ -173,55 +180,57 @@ describe("yumml parse", () => {
     assert.match(result.out, /Ledger\n {2}bread\s+declared 2 slice\s+drawn 2 slice\s+ok/);
   });
 
-  test("a broken recipe refuses to print a model", () => {
-    const result = run(["parse", "toast.yaml"], { "toast.yaml": INVALID_REFS });
+  test("a broken recipe refuses to print a model", async () => {
+    const result = await run(["parse", "toast.yaml"], { "toast.yaml": INVALID_REFS });
     assert.equal(result.code, EXIT_DIAGNOSTICS);
     assert.equal(result.out, "");
     assert.match(result.err, /ref\/unresolved/);
   });
 
-  test("--json on a broken recipe is still machine-readable", () => {
-    const result = run(["parse", "toast.yaml", "--json"], { "toast.yaml": INVALID_REFS });
+  test("--json on a broken recipe is still machine-readable", async () => {
+    const result = await run(["parse", "toast.yaml", "--json"], {
+      "toast.yaml": INVALID_REFS,
+    });
     assert.equal(result.code, EXIT_DIAGNOSTICS);
     assert.equal((JSON.parse(result.out) as { ok: boolean }).ok, false);
   });
 });
 
 describe("usage", () => {
-  test("--help and --version exit 0", () => {
-    const help = run(["--help"]);
+  test("--help and --version exit 0", async () => {
+    const help = await run(["--help"]);
     assert.equal(help.code, EXIT_OK);
     assert.match(help.out, /^yumml — recipes as YAML, checked hard/);
     assert.match(help.out, /Exit codes/);
 
-    const version = run(["--version"]);
+    const version = await run(["--version"]);
     assert.equal(version.code, EXIT_OK);
     assert.equal(version.out, "9.9.9\n");
   });
 
-  test("nonsense arguments exit 2 with the usage text", () => {
+  test("nonsense arguments exit 2 with the usage text", async () => {
     for (const argv of [
       [],
       ["frobnicate"],
       ["validate"],
       ["validate", "--nope", "x.yaml"],
     ]) {
-      const result = run(argv);
+      const result = await run(argv);
       assert.equal(result.code, EXIT_USAGE, argv.join(" "));
       assert.match(result.err, /Usage/);
     }
   });
 
-  test("--json and --summary are mutually exclusive", () => {
-    const result = run(["parse", "toast.yaml", "--json", "--summary"], {
+  test("--json and --summary are mutually exclusive", async () => {
+    const result = await run(["parse", "toast.yaml", "--json", "--summary"], {
       "toast.yaml": VALID,
     });
     assert.equal(result.code, EXIT_USAGE);
     assert.match(result.err, /cannot both be used/);
   });
 
-  test("a bug in yumml exits 3, never 1", () => {
-    const code = runCli({
+  test("a bug in yumml exits 3, never 1", async () => {
+    const code = await runCli({
       argv: ["validate", "toast.yaml"],
       readFile: () => VALID,
       stdout: () => {

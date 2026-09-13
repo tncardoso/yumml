@@ -292,6 +292,18 @@ renderer embeds: nodes with adjacency, a topological `order` with preparation st
 a reverse `consumers` map, and a `ledger` with one declared-versus-drawn entry per
 quantified ingredient.
 
+Render that model into any HTML element with the browser-only visualization API:
+
+```ts
+import { parseRecipe, renderRecipe } from "@yumml/yumml";
+
+const result = parseRecipe(yamlText);
+if (result.ok) renderRecipe(result.recipe, document.querySelector("#recipe")!);
+```
+
+The renderer replaces the element's contents with responsive HTML and scoped CSS. It has
+no server component, network requests, runtime dependencies, or global styles.
+
 The smaller pieces are exported too, for callers that want one stage instead of four:
 `parseYaml`, `validateValue`, `analyze`, `loadSource`, `withSource`, plus exact rational
 arithmetic (`fraction`, `add`, `mul`, `cmp`, `format`), duration parsing, and the unit

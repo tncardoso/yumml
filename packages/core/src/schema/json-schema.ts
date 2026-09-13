@@ -1,5 +1,5 @@
 /**
- * The published JSON Schema, generated from the wire schema (D14).
+ * The published JSON Schema, generated from the wire schema.
  *
  * Editors use it for completion and inline errors in `.yaml` files:
  *

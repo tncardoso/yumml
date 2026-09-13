@@ -11,7 +11,7 @@
  * ```
  *
  * `parseRecipe` runs all four and returns either a {@link Recipe} or the list of
- * everything wrong with the input. There is no lenient mode (D2): a recipe that
+ * everything wrong with the input. There is no lenient mode: a recipe that
  * has a problem gets diagnostics, never a repaired model.
  *
  * ```ts
@@ -35,7 +35,7 @@ export type ParseResult =
 
 /**
  * Parses and checks a recipe. Accepts the file's text or its raw bytes; the
- * caller does the reading, so this runs unchanged in a browser (D1).
+ * caller does the reading, so this runs unchanged in a browser.
  *
  * Diagnostics come back sorted by position in the source, and every one of them
  * that has a position in the file carries `loc` and `range`.
@@ -132,6 +132,7 @@ export type {
 export { toModel } from "./model/recipe.ts";
 export type { UnitDimension, UnitInfo, UnitName, UnitSystem } from "./model/unit.ts";
 export { DEFAULT_UNIT, isUnitName, UNIT_NAMES, UNITS, unitInfo } from "./model/unit.ts";
+export { renderRecipe } from "./render.ts";
 export {
   JSON_SCHEMA_ID,
   JSON_SCHEMA_NOTE,

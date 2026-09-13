@@ -11,7 +11,7 @@ const version = "0.1.1";
 
 const argv = process.argv.slice(2);
 
-const exitCode = runCli({
+const exitCode = await runCli({
   // A package runner forwards the arguments that follow a `--` of its own, and
   // flags can follow it there: `pnpm run yumml -- parse recipe.yaml --summary`.
   // That separator belongs to the launch, not to yumml's own grammar, so it is

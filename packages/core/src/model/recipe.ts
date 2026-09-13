@@ -17,7 +17,7 @@ import { DEFAULT_UNIT, isUnitName, type UnitName } from "./unit.ts";
 
 /**
  * One entry of a step's `uses` list. A missing `qty` is the bare form, which
- * means "full use" of the target (plan.md D6, §11).
+ * means "full use" of the target.
  */
 export type Draw = {
   readonly id: string;
@@ -28,9 +28,9 @@ export type Draw = {
 
 export type IngredientNode = {
   readonly id: string;
-  /** Display text; falls back to the id (D16). */
+  /** Display text; falls back to the id. */
   readonly desc: string;
-  /** Absent means unquantified: "salt to taste". Ledger-exempt (D17). */
+  /** Absent means unquantified: "salt to taste" and ledger-exempt. */
   readonly qty?: Fraction;
   /** Always present in the model. Meaningful only when `qty` is. */
   readonly unit: UnitName;
@@ -40,7 +40,7 @@ export type StepNode = {
   readonly id: string;
   readonly desc: string;
   readonly uses: readonly Draw[];
-  /** Viewer timer hint in seconds (D4). */
+  /** Viewer timer hint in seconds. */
   readonly timeSec?: number;
 };
 
@@ -60,7 +60,7 @@ export type RecipeInput = {
 };
 
 export type Recipe = RecipeInput & {
-  /** Topological order, preparation steps first, file order as tie-break (D18). */
+  /** Topological order, preparation steps first, file order as tie-break. */
   readonly order: readonly string[];
   /** Reverse edges: node id → the steps that draw from it. */
   readonly consumers: Readonly<Record<string, readonly string[]>>;

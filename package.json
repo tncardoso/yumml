@@ -16,7 +16,7 @@
     "check:write": "biome check --write .",
     "lint": "biome lint .",
     "format": "biome format --write .",
-    "test": "node --test --conditions=yumml-dev packages/cli/src/*.test.ts packages/core/src/*/*.test.ts",
+    "test": "node --test --conditions=yumml-dev packages/cli/src/*.test.ts packages/cli/src/cookbook/*.test.ts packages/core/src/*/*.test.ts",
     "typecheck": "pnpm -r run typecheck",
     "build": "pnpm -r run build",
     "schema": "node packages/core/scripts/emit-json-schema.ts",

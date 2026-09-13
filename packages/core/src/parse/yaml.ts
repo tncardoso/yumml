@@ -6,10 +6,10 @@
  * byte range of every node — which is what makes an error message point at a
  * line — and because it refuses to construct arbitrary objects from tags.
  *
- * The policy here is plan.md §4.2: one document, duplicate keys are errors,
+ * The policy here is: one document, duplicate keys are errors,
  * merge keys and custom tags are refused, and scalars are never coerced beyond
  * the YAML 1.2 core schema. In particular `2024-01-01` stays a string and
- * `yes` stays a string (D24); a `title: 2024` does not become a year.
+ * `yes` stays a string; a `title: 2024` does not become a year.
  */
 
 import {

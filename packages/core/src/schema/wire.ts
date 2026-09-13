@@ -2,7 +2,7 @@
  * The wire schema: what a recipe file is allowed to contain, in the exact shape
  * the YAML holds it.
  *
- * This is the single source of truth (plan.md D14). It is deliberately *pure*:
+ * This is the single source of truth. It is deliberately *pure*:
  * no transforms, no custom checks, nothing zod cannot express as JSON Schema.
  * Two things are derived from it:
  *

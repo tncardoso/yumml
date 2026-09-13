@@ -7,9 +7,9 @@
  * - `code` is stable and documented; `message` is not. Tests assert on codes, so
  *   rewriting a message never breaks the suite.
  * - `path` is always present, because it is what lets the pipeline route an
- *   error back to a line and column in the source (plan.md §4.3).
+ *   error back to a line and column in the source.
  *
- * v1 emits `severity: "error"` only (D2, D25); the field exists so a future
+ * v1 emits `severity: "error"` only; the field exists so a future
  * warning level does not change the shape of every consumer.
  */
 

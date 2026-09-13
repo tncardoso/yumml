@@ -192,7 +192,7 @@ describe("L3 — unused nodes", () => {
   });
 });
 
-describe("L3 — the ledger (§11)", () => {
+describe("L3 — the ledger", () => {
   test("a leftovers is an error, with the amount left over", () => {
     const diagnostics = reject(
       withParts(

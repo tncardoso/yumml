@@ -6,8 +6,8 @@
  * 1. Run the wire schema and turn zod's issues into {@link Diagnostic}s with a
  *    code the test suite can assert on and a message that names the field.
  * 2. Route every diagnostic — including the ones L3 finds later — back to a line
- *    and column, by asking the YAML document for the node at the issue's path
- *    (plan.md §4.3). When the path itself does not exist, which is what a
+ *    and column, by asking the YAML document for the node at the issue's path.
+ *    When the path itself does not exist, which is what a
  *    missing field looks like, the nearest existing ancestor is used instead, so
  *    the error points at the ingredient rather than nowhere.
  */

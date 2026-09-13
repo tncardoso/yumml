@@ -2,7 +2,7 @@
  * L0 — turning bytes into text.
  *
  * The CLI reads the file; the core never touches the filesystem, so the same
- * parser runs in a browser (D1). What is decided here: the encoding, the BOM,
+ * parser runs in a browser. What is decided here: the encoding, the BOM,
  * and a size cap so a runaway file cannot hang a page.
  */
 
