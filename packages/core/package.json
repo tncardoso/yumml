@@ -16,6 +16,11 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./render": {
+      "yumml-dev": "./src/render.ts",
+      "types": "./dist/render.d.ts",
+      "default": "./dist/render.js"
+    },
     "./schema.json": "./schema/yumml-v1.schema.json"
   },
   "files": [
