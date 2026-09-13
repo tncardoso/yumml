@@ -8,7 +8,7 @@ const STYLES = `
   --yv-ink: #22303c;
   --yv-line: #d8d9d5;
   --yv-paper: #fffdfa;
-  --yv-row-height: clamp(4.25rem, 6vw, 5.25rem);
+  --yv-row-height: clamp(3.25rem, 4.5vw, 3.75rem);
   container-type: inline-size;
   box-sizing: border-box;
   width: 100%;
@@ -31,18 +31,19 @@ const STYLES = `
 .yumml-vis .yv-viewport:focus-visible { outline: .2rem solid #397da8; outline-offset: .15rem; }
 .yumml-vis .yv-flow { display: grid; width: 100%; grid-template-columns: clamp(16rem, 40cqi, 40rem) minmax(0, 1fr); padding: 1rem; }
 .yumml-vis .yv-ingredients { position: relative; z-index: 2; overflow: hidden; border: 1px solid #cfd4d3; border-radius: .7rem 0 0 .7rem; }
-.yumml-vis .yv-ingredient { display: flex; min-height: var(--yv-row-height); align-items: center; gap: .45rem; border-bottom: 1px solid #cfd4d3; background: #f7faf9; background: color-mix(in srgb, var(--yv-row-color) 8%, white); padding: .75rem 1rem; line-height: 1.25; }
+.yumml-vis .yv-ingredient { display: flex; min-height: var(--yv-row-height); align-items: center; gap: .45rem; border-bottom: 1px solid #cfd4d3; background: #f7faf9; background: color-mix(in srgb, var(--yv-row-color) 8%, white); padding: .6rem .85rem; font-size: .9rem; line-height: 1.25; }
 .yumml-vis .yv-ingredient:last-child { border-bottom: 0; }
 .yumml-vis .yv-quantity { flex: none; font-weight: 750; }
 .yumml-vis .yv-empty { color: #68727a; font-style: italic; }
 .yumml-vis .yv-stages { display: grid; min-width: 0; grid-template-columns: repeat(var(--yv-stage-count), minmax(6rem, 1fr)); }
+.yumml-vis .yv-stage-column { display: grid; min-width: 0; grid-template-columns: repeat(var(--yv-lane-count), minmax(0, 1fr)); grid-template-rows: repeat(var(--yv-row-count), var(--yv-row-height)); }
 .yumml-vis .yv-stage { display: grid; min-width: 0; grid-template-rows: repeat(var(--yv-row-count), var(--yv-row-height)); }
 .yumml-vis .yv-stage-band { position: relative; display: grid; min-height: var(--yv-row-height); place-items: center; border-inline-start: 1px solid rgb(0 0 0 / 18%); background: var(--yv-color); color: white; text-align: center; }
-.yumml-vis .yv-stage:not(:last-child) .yv-stage-band::after { position: absolute; z-index: 3; right: -.8rem; width: 1.6rem; height: 1.6rem; background: var(--yv-color); content: ""; clip-path: polygon(0 0, 100% 50%, 0 100%, 25% 50%); }
-.yumml-vis .yv-stage-content { position: sticky; left: 0; z-index: 4; display: grid; max-width: 100%; justify-items: center; gap: .35rem; padding: .7rem .4rem; }
-.yumml-vis .yv-stage .yv-number { background: white; color: var(--yv-color); font-weight: 800; }
-.yumml-vis .yv-stage-label { overflow-wrap: anywhere; font-size: clamp(.82rem, 1.6vw, 1rem); font-weight: 750; line-height: 1.08; }
-.yumml-vis .yv-duration { font-size: .75rem; font-weight: 650; opacity: .9; }
+.yumml-vis .yv-stage-arrow { z-index: 3; align-self: center; justify-self: end; width: 1.6rem; height: 1.6rem; margin-right: -.8rem; background: var(--yv-color); clip-path: polygon(0 0, 100% 50%, 0 100%, 25% 50%); pointer-events: none; }
+.yumml-vis .yv-stage-content { position: sticky; left: 0; z-index: 4; display: grid; max-width: 100%; justify-items: center; gap: .2rem; padding: .35rem .3rem; }
+.yumml-vis .yv-stage .yv-number { width: 1.7rem; height: 1.7rem; background: white; color: var(--yv-color); font-weight: 800; }
+.yumml-vis .yv-stage-label { overflow-wrap: anywhere; font-size: clamp(.72rem, 1.4vw, .9rem); font-weight: 750; line-height: 1.08; }
+.yumml-vis .yv-duration { font-size: .7rem; font-weight: 650; opacity: .9; }
 .yumml-vis .yv-no-stages { display: grid; place-items: center; color: #68727a; font-size: .875rem; }
 @container (max-width: 40rem) {
   .yumml-vis .yv-header { align-items: start; flex-direction: column; }
@@ -109,6 +110,97 @@ function ingredientAncestors(
   return result;
 }
 
+type StageColumn = readonly StepNode[];
+
+type StagePlacement = {
+  readonly step: StepNode;
+  readonly start: number;
+  readonly end: number;
+  readonly lane: number;
+};
+
+/** Groups non-preparation steps into their earliest topological columns. */
+function stageColumns(orderedSteps: readonly StepNode[]): StageColumn[] {
+  const depths = new Map<string, number>();
+  const columns: StepNode[][] = [];
+  for (const step of orderedSteps) {
+    if (step.uses.length === 0) continue;
+    const depth = step.uses.reduce(
+      (latest, draw) => Math.max(latest, (depths.get(draw.id) ?? -1) + 1),
+      0,
+    );
+    depths.set(step.id, depth);
+    const column = columns[depth];
+    if (column === undefined) columns[depth] = [step];
+    else column.push(step);
+  }
+  return columns;
+}
+
+/** Orders ingredient rows by walking each terminal branch back to its sources. */
+function orderedIngredients(
+  recipe: Recipe,
+  orderedSteps: readonly StepNode[],
+): IngredientNode[] {
+  const ingredients = new Map(
+    recipe.ingredients.map((ingredient) => [ingredient.id, ingredient]),
+  );
+  const steps = new Map(orderedSteps.map((step) => [step.id, step]));
+  const seenIngredients = new Set<string>();
+  const seenSteps = new Set<string>();
+  const ordered: IngredientNode[] = [];
+
+  function visit(step: StepNode): void {
+    if (seenSteps.has(step.id)) return;
+    seenSteps.add(step.id);
+    for (const draw of step.uses) {
+      const ingredient = ingredients.get(draw.id);
+      if (ingredient !== undefined && !seenIngredients.has(ingredient.id)) {
+        seenIngredients.add(ingredient.id);
+        ordered.push(ingredient);
+      }
+      const producer = steps.get(draw.id);
+      if (producer !== undefined) visit(producer);
+    }
+  }
+
+  for (const step of orderedSteps) {
+    if ((recipe.consumers[step.id]?.length ?? 0) === 0) visit(step);
+  }
+  return [...ordered, ...recipe.ingredients.filter(({ id }) => !seenIngredients.has(id))];
+}
+
+function stagePlacements(
+  stages: StageColumn,
+  ingredientIds: ReadonlySet<string>,
+  ingredientIndex: ReadonlyMap<string, number>,
+  stepById: ReadonlyMap<string, StepNode>,
+  cache: Map<string, ReadonlySet<string>>,
+  rowCount: number,
+): StagePlacement[] {
+  const lanes: StagePlacement[][] = [];
+  return stages.map((step) => {
+    const indices = [...ingredientAncestors(step, ingredientIds, stepById, cache)]
+      .map((id) => ingredientIndex.get(id))
+      .filter((value): value is number => value !== undefined)
+      .sort((a, b) => a - b);
+    const placement = {
+      step,
+      start: indices[0] ?? 0,
+      end: indices.at(-1) ?? rowCount - 1,
+      lane: 0,
+    };
+    const lane = lanes.findIndex((items) =>
+      items.every(({ start, end }) => end < placement.start || placement.end < start),
+    );
+    placement.lane = lane === -1 ? lanes.length : lane;
+    const target = lanes[placement.lane];
+    if (target === undefined) lanes[placement.lane] = [placement];
+    else target.push(placement);
+    return placement;
+  });
+}
+
 function appendPreparation(
   document: Document,
   root: HTMLElement,
@@ -139,19 +231,21 @@ function fillIngredients(
   document: Document,
   list: HTMLElement,
   recipe: Recipe,
+  ingredients: readonly IngredientNode[],
   stageIndex: ReadonlyMap<string, number>,
 ): void {
-  if (recipe.ingredients.length === 0) {
+  if (ingredients.length === 0) {
     list.append(element(document, "div", "yv-ingredient yv-empty", "No ingredients"));
     return;
   }
-  for (const ingredient of recipe.ingredients) {
+  for (const ingredient of ingredients) {
     const row = element(document, "div", "yv-ingredient");
     row.dataset.nodeId = ingredient.id;
     row.setAttribute("role", "listitem");
-    const firstConsumer = recipe.consumers[ingredient.id]?.[0];
     const colorIndex =
-      firstConsumer === undefined ? 0 : (stageIndex.get(firstConsumer) ?? 0);
+      recipe.consumers[ingredient.id]
+        ?.map((consumer) => stageIndex.get(consumer))
+        .find((index): index is number => index !== undefined) ?? 0;
     row.style.setProperty(
       "--yv-row-color",
       COLORS[colorIndex % COLORS.length] ?? COLORS[0],
@@ -166,49 +260,69 @@ function fillIngredients(
 function fillStages(
   document: Document,
   list: HTMLElement,
-  recipe: Recipe,
-  stages: readonly StepNode[],
+  ingredients: readonly IngredientNode[],
+  columns: readonly StageColumn[],
   stepById: ReadonlyMap<string, StepNode>,
   numbers: ReadonlyMap<string, number>,
   rowCount: number,
 ): void {
-  if (stages.length === 0) {
+  if (columns.length === 0) {
     list.className += " yv-no-stages";
     list.textContent = "Preparation only";
     return;
   }
-  const ingredientIds = new Set(recipe.ingredients.map((ingredient) => ingredient.id));
+  const ingredientIds = new Set(ingredients.map((ingredient) => ingredient.id));
   const ingredientIndex = new Map(
-    recipe.ingredients.map((ingredient, index) => [ingredient.id, index]),
+    ingredients.map((ingredient, index) => [ingredient.id, index]),
   );
   const ancestorCache = new Map<string, ReadonlySet<string>>();
-  for (const [index, step] of stages.entries()) {
-    const indices = [...ingredientAncestors(step, ingredientIds, stepById, ancestorCache)]
-      .map((id) => ingredientIndex.get(id))
-      .filter((value): value is number => value !== undefined)
-      .sort((a, b) => a - b);
-    const start = indices[0] ?? 0;
-    const end = indices.at(-1) ?? rowCount - 1;
+  for (const [index, stages] of columns.entries()) {
     const color = COLORS[index % COLORS.length] ?? COLORS[0];
-    const stage = element(document, "div", "yv-stage");
-    stage.dataset.nodeId = step.id;
-    stage.style.setProperty("--yv-color", color);
-    const band = element(document, "div", "yv-stage-band");
-    band.style.setProperty("grid-row", `${start + 1} / span ${end - start + 1}`);
-    band.style.setProperty("--yv-color", color);
-    const content = element(document, "div", "yv-stage-content");
-    content.append(
-      element(document, "span", "yv-number", String(numbers.get(step.id))),
-      element(document, "span", "yv-stage-label", step.desc),
+    const placements = stagePlacements(
+      stages,
+      ingredientIds,
+      ingredientIndex,
+      stepById,
+      ancestorCache,
+      rowCount,
     );
-    if (step.timeSec !== undefined) {
+    const column = element(document, "div", "yv-stage-column");
+    column.style.setProperty(
+      "--yv-lane-count",
+      String(Math.max(...placements.map(({ lane }) => lane + 1))),
+    );
+    for (const { step, start, end, lane } of placements) {
+      const stage = element(document, "div", "yv-stage");
+      stage.dataset.nodeId = step.id;
+      stage.style.setProperty("--yv-color", color);
+      stage.style.setProperty("grid-column", String(lane + 1));
+      stage.style.setProperty("grid-row", `1 / span ${rowCount}`);
+      const band = element(document, "div", "yv-stage-band");
+      band.style.setProperty("grid-row", `${start + 1} / span ${end - start + 1}`);
+      band.style.setProperty("--yv-color", color);
+      const content = element(document, "div", "yv-stage-content");
       content.append(
-        element(document, "span", "yv-duration", displayDuration(step.timeSec)),
+        element(document, "span", "yv-number", String(numbers.get(step.id))),
+        element(document, "span", "yv-stage-label", step.id),
       );
+      if (step.timeSec !== undefined) {
+        content.append(
+          element(document, "span", "yv-duration", displayDuration(step.timeSec)),
+        );
+      }
+      band.append(content);
+      stage.append(band);
+      column.append(stage);
+      if (index < columns.length - 1) {
+        const arrow = element(document, "div", "yv-stage-arrow");
+        arrow.setAttribute("aria-hidden", "true");
+        arrow.style.setProperty("--yv-color", color);
+        arrow.style.setProperty("grid-column", "1 / -1");
+        arrow.style.setProperty("grid-row", `${start + 1} / span ${end - start + 1}`);
+        column.append(arrow);
+      }
     }
-    band.append(content);
-    stage.append(band);
-    list.append(stage);
+    list.append(column);
   }
 }
 
@@ -225,10 +339,13 @@ export function renderRecipe(recipe: Recipe, target: HTMLElement): HTMLElement {
     .filter((step): step is StepNode => step !== undefined);
   const numbers = new Map(orderedSteps.map((step, index) => [step.id, index + 1]));
   const prep = orderedSteps.filter((step) => step.uses.length === 0);
-  const stages = orderedSteps.filter((step) => step.uses.length > 0);
-  const stageIndex = new Map(stages.map((step, index) => [step.id, index]));
-  const rowCount = Math.max(recipe.ingredients.length, 1);
-  const stageCount = Math.max(stages.length, 1);
+  const columns = stageColumns(orderedSteps);
+  const ingredients = orderedIngredients(recipe, orderedSteps);
+  const stageIndex = new Map(
+    columns.flatMap((stages, index) => stages.map((step) => [step.id, index] as const)),
+  );
+  const rowCount = Math.max(ingredients.length, 1);
+  const stageCount = Math.max(columns.length, 1);
 
   const root = element(document, "section", "yumml-vis");
   root.setAttribute("aria-label", `${recipe.title} recipe flow`);
@@ -258,10 +375,10 @@ export function renderRecipe(recipe: Recipe, target: HTMLElement): HTMLElement {
   const ingredientList = element(document, "div", "yv-ingredients");
   ingredientList.setAttribute("role", "list");
 
-  fillIngredients(document, ingredientList, recipe, stageIndex);
+  fillIngredients(document, ingredientList, recipe, ingredients, stageIndex);
 
   const stageList = element(document, "div", "yv-stages");
-  fillStages(document, stageList, recipe, stages, stepById, numbers, rowCount);
+  fillStages(document, stageList, ingredients, columns, stepById, numbers, rowCount);
 
   flow.append(ingredientList, stageList);
   viewport.append(flow);

@@ -222,7 +222,7 @@ describe("the core flow mount", () => {
 
   test("the legend names the three things in the picture", () => {
     const html = page();
-    assert.match(html, /step column/);
+    assert.match(html, /cooking column/);
     assert.match(html, /ingredient row/);
     assert.match(html, /legend-swatch--prep/);
   });

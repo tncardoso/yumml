@@ -190,7 +190,7 @@ function strips(recipe: Recipe, current: string | undefined): Html {
 function legend(): Html {
   return html`
     <p class="legend" aria-hidden="true">
-      <span class="legend-item"><span class="legend-swatch legend-swatch--step"></span>step column</span>
+      <span class="legend-item"><span class="legend-swatch legend-swatch--step"></span>cooking column</span>
       <span class="legend-item"><span class="legend-swatch legend-swatch--row"></span>ingredient row</span>
       <span class="legend-item"><span class="legend-swatch legend-swatch--prep"></span>prep</span>
     </p>
@@ -247,7 +247,7 @@ export function renderRecipePage(
           <div>
             <h2 class="flow-title">How it flows</h2>
             <p class="flow-sub">
-              Every column is a step. Its height is what it takes in — read left to right.
+              Each column is a cooking round; steps that can happen together share one.
             </p>
           </div>
           ${legend()}

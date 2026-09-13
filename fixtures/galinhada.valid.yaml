@@ -1,0 +1,94 @@
+title: Galinhada de cuz cuz marroquino
+servings: 4
+ingredients:
+  - id: frango
+    desc: filés de peito de frango
+    qty: 2
+    unit: item
+  - id: cuzcuz
+    desc: cuz cuz marroquino
+    qty: 1
+    unit: cup
+  - id: tomates
+    qty: 2
+    unit: item
+  - id: quiabo-vagem
+    desc: quiabo ou vagem
+    qty: 250
+    unit: g
+  - id: cebola
+    qty: 1
+    unit: item
+  - id: alho
+    desc: dentes de alho
+    qty: 2
+    unit: item
+  - id: agua
+    desc: água
+    qty: 2
+    unit: item
+  - id: paprica
+    desc: páprica picante
+    qty: "3/2"
+    unit: tsp
+  - id: curcuma
+    desc: cúrcuma
+    qty: "1/2"
+    unit: tsp
+  - id: cominho
+    qty: 1
+    unit: tsp
+  - id: limao
+    desc: caldo de limão
+    qty: "1/2"
+    unit: item
+  - id: azeite
+    desc: azeita a gosto
+  - id: coentro
+    desc: folhas de coentro a gosto
+  - id: sal-pimenta
+    desc: sal e pimenta do reino a gosto
+steps:
+  - id: cortar
+    desc: Corte os filés de frago em cubos médios de 2 cm e tempere.
+    uses: ["frango", "sal-pimenta"]
+  - id: cortar-tomates
+    desc: Corte em cubos pequenos
+    uses: ["tomates"]
+  - id: cortar-alho
+    desc: Corte
+    uses: ["alho"]
+  - id: cortar-cebola
+    desc: Corte
+    uses: ["cebola"]
+  - id: cortar-quiabo-vagem
+    desc: Corte
+    uses: ["quiabo-vagem"]
+  - id: ferver
+    uses: ["agua"]
+  - id: dourar
+    uses: ["cortar", "azeite"]
+    time: 5min
+  - id: refogue
+    desc: afaste o frango para lateral, adicione azeite, refogue
+    uses: ["dourar", "cortar-cebola"]
+  - id: refogue-tomates
+    desc: refogar
+    uses: ["refogue", "cortar-tomates"]
+    time: 2min
+  - id: refogue-alho
+    desc: junte e misture bem
+    uses: ["refogue-tomates", "cortar-alho", "paprica", "curcuma", "cominho"]
+  - id: junte
+    desc: junte e evite mexer
+    uses: ["refogue-alho", "cortar-quiabo-vagem"]
+  - id: misture
+    desc: misture delicadamente e desligue o fogo
+    uses: ["junte", "cuzcuz", "ferver"]
+  - id: hidratar
+    desc: deixe hidratar
+    uses: ["misture", "limao"]
+    time: 5m
+  - id: finalizar
+    uses: ["hidratar", "coentro"]
+

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { describe, test } from "node:test";
 import { parseRecipe, renderRecipe } from "../index.ts";
 
@@ -59,6 +60,10 @@ function text(node: FakeElement): string {
   return [node.textContent, ...node.children.map(text)].join(" ");
 }
 
+function stages(column: FakeElement): FakeElement[] {
+  return column.children.filter((item) => item.className === "yv-stage");
+}
+
 const SOURCE = `
 title: Banana Bread
 servings: 10
@@ -77,6 +82,11 @@ steps:
   - { id: combine, uses: [mash, mix] }
   - { id: bake, uses: [combine], time: 1h30m }
 `;
+
+const GALINHADA_SOURCE = readFileSync(
+  new URL("../../../../fixtures/galinhada.valid.yaml", import.meta.url),
+  "utf8",
+);
 
 describe("renderRecipe", () => {
   test("renders a responsive recipe flow into the supplied document", () => {
@@ -101,10 +111,18 @@ describe("renderRecipe", () => {
     assert.match(text(rendered), /1 hr 30 min/);
     assert.equal(rendered.attributes.get("aria-label"), "Banana Bread recipe flow");
     assert.equal(byClass(rendered, "yv-prep-item")[0]?.dataset.nodeId, "prepare");
+    const columns = byClass(rendered, "yv-stage-column");
     assert.deepEqual(
-      byClass(rendered, "yv-stage").map((stage) => stage.dataset.nodeId),
-      ["mash", "melt", "brush", "sift", "mix", "combine", "bake"],
+      columns.map((column) => stages(column).map((stage) => stage.dataset.nodeId)),
+      [["mash", "melt", "brush", "sift"], ["mix"], ["combine"], ["bake"]],
     );
+    assert.equal(rendered.style.values.get("--yv-stage-count"), "4");
+    assert.equal(columns[0]?.style.values.get("--yv-lane-count"), "2");
+
+    const brush = byClass(rendered, "yv-stage").find(
+      (stage) => stage.dataset.nodeId === "brush",
+    );
+    assert.equal(brush?.style.values.get("grid-column"), "2");
 
     const combine = byClass(rendered, "yv-stage").find(
       (stage) => stage.dataset.nodeId === "combine",
@@ -118,6 +136,87 @@ describe("renderRecipe", () => {
       css ?? "",
       /https?:\/\//,
       "rendering does not load remote assets",
+    );
+  });
+
+  test("groups galinhada's ready steps into monotonic columns", () => {
+    const parsed = parseRecipe(GALINHADA_SOURCE);
+    assert.ok(parsed.ok);
+    const document = new FakeDocument();
+    const target = document.createElement("main");
+    const rendered = renderRecipe(
+      parsed.recipe,
+      target as unknown as HTMLElement,
+    ) as unknown as FakeElement;
+    const columns = byClass(rendered, "yv-stage-column");
+
+    assert.deepEqual(
+      columns.map((column) => stages(column).map((stage) => stage.dataset.nodeId)),
+      [
+        [
+          "cortar",
+          "cortar-tomates",
+          "cortar-alho",
+          "cortar-cebola",
+          "cortar-quiabo-vagem",
+          "ferver",
+        ],
+        ["dourar"],
+        ["refogue"],
+        ["refogue-tomates"],
+        ["refogue-alho"],
+        ["junte"],
+        ["misture"],
+        ["hidratar"],
+        ["finalizar"],
+      ],
+    );
+    assert.equal(columns[0]?.style.values.get("--yv-lane-count"), "1");
+    assert.equal(byClass(columns[0] as FakeElement, "yv-stage-arrow").length, 6);
+    assert.deepEqual(
+      byClass(rendered, "yv-ingredient").map((ingredient) => ingredient.dataset.nodeId),
+      [
+        "frango",
+        "sal-pimenta",
+        "azeite",
+        "cebola",
+        "tomates",
+        "alho",
+        "paprica",
+        "curcuma",
+        "cominho",
+        "quiabo-vagem",
+        "cuzcuz",
+        "agua",
+        "limao",
+        "coentro",
+      ],
+    );
+    const cortar = stages(columns[0] as FakeElement)[0];
+    assert.equal(cortar?.children[0]?.style.values.get("grid-row"), "1 / span 2");
+    assert.equal(cortar?.children[0]?.children[0]?.children[1]?.textContent, "cortar");
+    assert.deepEqual(
+      columns
+        .slice(1)
+        .map((column) => stages(column)[0]?.children[0]?.style.values.get("grid-row")),
+      [
+        "1 / span 3",
+        "1 / span 4",
+        "1 / span 5",
+        "1 / span 9",
+        "1 / span 10",
+        "1 / span 12",
+        "1 / span 13",
+        "1 / span 14",
+      ],
+    );
+    assert.equal(
+      stages(columns[0] as FakeElement)[0]?.style.values.get("--yv-color"),
+      stages(columns[0] as FakeElement)[1]?.style.values.get("--yv-color"),
+    );
+    assert.notEqual(
+      stages(columns[0] as FakeElement)[0]?.style.values.get("--yv-color"),
+      stages(columns[1] as FakeElement)[0]?.style.values.get("--yv-color"),
     );
   });
 });

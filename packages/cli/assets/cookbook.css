@@ -919,8 +919,8 @@ a {
 }
 
 /*
-  A column is how the script walks the recipe, and the pointer says so — but only
-  once the script is there. A picture that cannot be clicked should not offer.
+  A step band is how the script walks the recipe, and the pointer says so — but
+  only once the script is there. A picture that cannot be clicked should not offer.
 */
 .has-script .flow-band,
 .has-script .flow-prep,
